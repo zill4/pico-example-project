@@ -23,13 +23,12 @@ Establish a reproducible PICO OS 6 baseline and execute Project 01 from Spatial 
 
 Immediate next actions:
 
-1. Diagnose PICO `spatialbundle.exe` exit `0xC0000135`; formatting passes, but tests/debug assembly cannot complete until the missing Windows runtime dependency is resolved.
-2. Open the project in Android Studio `2025.1.4` and confirm Gradle sync is clean.
-3. Start the `Pico` AVD, deploy the unmodified app, and record the result.
-4. Sign in to PICO Developer Center if needed and record only whether access works; never record credentials.
-5. Start a new Codex session from this project and verify that the installed PICO skills plus `pico-dev-knowledge` and `pico-spatial-editor` MCP tools are exposed.
-6. Complete `PM-0 — Reproducible Baseline` in `PROJECT_01_ROOM_QUEST.md` and save build/emulator evidence.
-7. Inventory the room objects, scene names, target nodes, and placement/highlight code needed for `PM-1`.
+1. Begin `PM-1` with a product-level room-object record for `xr_headset`, `vase`, `headphones`, `art_print`, and `desk_lamp`.
+2. Add pure catalog, selection, scene-snapshot, and invalid-ID tests before changing product UI.
+3. Add Stage selection, focus feedback, reset, and unavailable-object behavior while preserving container lifecycle cleanup.
+4. Draft and review Japanese content records for the five stable IDs, including pronunciation provenance.
+5. Sign in to PICO Developer Center if needed and record only whether access works; never record credentials.
+6. Verify `pico-dev-knowledge` and `pico-spatial-editor` MCP calls when those configured tools are exposed by the host.
 
 ## Verified local baseline
 
@@ -47,6 +46,7 @@ Snapshot captured on 2026-08-18. Paths and host details in this section are loca
 ### Android and PICO tools
 
 - [x] Android Studio `2025.1.4` is installed at `C:\Program Files\Android\Android Studio`.
+- [x] A fresh **Sync Project with Gradle Files** operation completed in Android Studio `2025.1.4` without an unresolved error; the IDE only recommended an optional Android Gradle Plugin upgrade.
 - [x] Android Studio's bundled JBR is OpenJDK `21.0.8`.
 - [x] Android SDK is configured in local-only `local.properties`.
 - [x] Android SDK Platform 35 is installed.
@@ -56,8 +56,8 @@ Snapshot captured on 2026-08-18. Paths and host details in this section are loca
 - [x] PICO Spatial Plugin exists in the Android Studio `2025.1.4` user profile.
 - [x] PICO Spatial Editor `6.0.0` is installed with the managed MCP launcher, backend, and runtime required by the Intelligent Plugins.
 - [x] PICO Emulator `6.0.0` is installed.
-- [x] A PICO AVD named `Pico` exists.
-- [~] No emulator or physical device was connected when `adb devices -l` was checked.
+- [x] The legacy Android AVD `Pico` exists, and a CLI-managed PICO AVD named `Pico_MVP` was created for reproducible project validation.
+- [x] `Pico_MVP` booted successfully and was visible as `emulator-5554`; the unmodified app installed, launched, and remained running.
 - [~] `adb`, `java`, and `javac` are not on the shell `PATH`; Android Studio and direct SDK/JBR paths remain usable.
 
 ### Agent tooling
@@ -73,7 +73,8 @@ Snapshot captured on 2026-08-18. Paths and host details in this section are loca
 - [x] Supporting tools are provisioned: agent-vault `6.0.4`, Graphify `0.5.5`, profiler utilities `0.1.0`, `uv 0.12.5`, and Primer CLI.
 - [x] User-level `PICO_HOME` is configured as `C:\Users\justc\AppData\Local\PICO\sdk`.
 - [x] Project context is recorded in `.pico-env.json` and `PICO-SPATIAL-AGENTIC-TOOLS.AGENTS.md`; `AGENTS.md` routes agents to that plugin guidance.
-- [~] The active Codex session predates installation and cannot hot-load the new skills/MCP tools. Open a new Codex session for host-visible verification.
+- [x] The current Codex session exposes the installed PICO Spatial skills, including environment, development-workflow, and emulator-operation guidance.
+- [~] `pico-dev-knowledge` and `pico-spatial-editor` are configured and pass `pico-cli mcp doctor`, but their MCP calls were not exposed by the host in this session.
 - [~] After the prescribed one-time Editor reinstall, `editor doctor` confirms the Editor is launchable and has its MCP launcher/backend/runtime with `usableForBootstrap: true`, while still emitting a contradictory `EDITOR_PARTIAL_INSTALLATIONS` metadata error. Do not repeat the uninstall/install loop without a new diagnosis.
 - [~] The root doctor also warns that npm is unavailable even though `npm --version` returns `11.10.1` and npm successfully performed both global installs. Treat this as a Windows command-discovery diagnostic discrepancy unless an npm-backed PICO command actually fails.
 
@@ -90,7 +91,7 @@ Snapshot captured on 2026-08-18. Paths and host details in this section are loca
 - [x] The current architecture demonstrates a planar default `WindowContainer`, a volumetric model-inspection `WindowContainer`, and a Full Space `Stage`.
 - [x] `editor-asset` contains the Spatial Editor project and USD/USDZ-style scene assets used to build `editor-asset.bundle`.
 - [x] `start-pico-emulator.bat` starts the `Pico` AVD with the PICO emulator distribution rather than Android Studio's stock emulator.
-- [~] Generated `app/build` and `editor-asset/build` output exists, but a fresh build was not run during this documentation pass.
+- [x] With the documented process-local Spatial Editor `PATH` workaround, `spotlessCheck test :app:assembleDebug --no-daemon` passes and produces `app-debug.apk` plus `editor-asset.bundle`.
 - [x] This folder is a Git repository on `main`, tracking `origin/main` at `https://github.com/zill4/pico-example-project.git`; the initial baseline was published in commit `f1ef28f`.
 
 ## PICO OS 6 context
@@ -149,12 +150,12 @@ The original estimate for a clean setup is roughly 30-60 minutes, heavily depend
 
 - [x] Obtain the [Welcome to PICO OS 6 sample](https://developer.picoxr.com/document/spatial-example/).
 - [x] Open its root directory in Android Studio.
-- [ ] Confirm Gradle sync completes without errors.
-- [ ] Start the `Pico` AVD from Android Studio or `start-pico-emulator.bat`.
-- [ ] Confirm the emulator appears in `adb devices` and Android Studio's device selector.
-- [ ] Run the `app` configuration.
-- [ ] Exercise Home, Furniture Library, volumetric inspection, Decorate Space, and the immersive room.
-- [ ] Record screenshots, failures, warnings, and baseline performance observations in a dated work-session entry.
+- [x] Confirm Gradle sync completes without errors.
+- [x] Start the managed `Pico_MVP` AVD with `pico-cli`.
+- [x] Confirm the emulator appears as `emulator-5554` in the PICO device list.
+- [x] Install and launch the debug APK on the managed AVD.
+- [x] Exercise Home, Furniture Library, volumetric inspection, Decorate Space, and the immersive room.
+- [x] Record the screenshot, runtime diagnostics, build result, and emulator result in a dated work-session entry.
 
 ### 5. PICO Intelligent Plugins
 
@@ -318,16 +319,17 @@ Android Studio supplies a compatible bundled JDK even though Java is not current
 
 ```powershell
 $env:JAVA_HOME = 'C:\Program Files\Android\Android Studio\jbr'
-.\gradlew.bat :app:assembleDebug
-.\gradlew.bat test
-.\gradlew.bat spotlessCheck
+$env:PATH = "$env:LOCALAPPDATA\PICO\sdk\6.0\editor\SpatialEditor;$env:PATH"
+.\gradlew.bat spotlessCheck test :app:assembleDebug --no-daemon
 ```
+
+The additional `PATH` entry lets `spatialbundle.exe` resolve `nanobind.dll`, which PICO Editor `6.0.0` installed in the sibling `SpatialEditor` directory. Keep this workaround local to the process; do not add the workstation path to portable Gradle configuration.
 
 Emulator and device checks:
 
 ```powershell
-.\start-pico-emulator.bat
-& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" devices -l
+pico-cli emulator start --avd Pico_MVP --wait-timeout 180 -y
+pico-cli device list --format json
 ```
 
 The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system images. Do not replace it with Android Studio's stock emulator command without revalidating the PICO AVD.
@@ -344,6 +346,11 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 | D-006 | 2026-08-18 | Accepted | Make Project 1 simulator-first and represent perception with known virtual scene entities. | This can prove spatial selection, manipulation, guidance, state, and scoring without misrepresenting emulator output as real camera recognition or physical-room validation. |
 | D-007 | 2026-08-18 | Accepted | Build Spatial Language Quest as the first vertical slice, then evolve it through Point-and-Place and Virtual Tidy Room Coach into Chore Helper. | This sequence proves the shared spatial mechanics in the emulator before adding AI planning and device-dependent perception. |
 | D-008 | 2026-08-18 | Accepted | Track Project 01 in `PROJECT_01_ROOM_QUEST.md` using evidence-gated product markers `PM-0` through `PM-9`. | Each marker remains independently demoable and unchecked until its listed build, test, emulator, or device evidence exists. |
+| D-009 | 2026-08-18 | Accepted | Implement the MVP conversation path in the order deterministic typed input, live typed AI, speech output, then measured push-to-talk input. | The simulator remains testable without microphone, network, or provider availability, while voice can be added without replacing product logic. |
+| D-010 | 2026-08-18 | Accepted | Give the AI brain a bounded semantic scene snapshot and require locally validated, allowlisted product intents before changing Stage state. | This keeps high-frequency scene ownership in the app/ECS path, limits hallucination impact, and creates deterministic contract tests. |
+| D-011 | 2026-08-18 | Accepted | Keep all Project 01 planning, requirements, experiments, decisions, and checkpoints in `PROJECT_01_ROOM_QUEST.md` under dated sections. | One navigable product history avoids Markdown-file bloat; future work should update this document instead of creating additional `PROJECT_01*.md` files. |
+| D-012 | 2026-08-18 | Accepted | Add the installed `SpatialEditor` directory to the current build process `PATH` on this workstation instead of changing portable Gradle configuration. | This resolves PICO Editor `6.0.0`'s sibling `nanobind.dll` lookup failure while keeping machine-local SDK paths out of source control. |
+| D-013 | 2026-08-18 | Accepted | Use `xr_headset`, `vase`, `headphones`, `art_print`, and `desk_lamp` as the first stable product IDs, mapped to the existing five catalog scenes and Full Space nodes. | Editor names such as `PicoEquipment` and `PicoEarphone` are implementation details and should not leak into AI prompts, tests, or persisted product state. |
 
 ## Open questions
 
@@ -352,10 +359,55 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 - Which 5–8 existing room objects provide the best first Japanese learning set?
 - Is PICO Developer Center account access already working?
 - Should the sample package/application ID and product branding remain until after the first prototype?
-- For an audio app, where will licensed sounds come from and what attribution is required?
-- Should this directory be initialized as a new Git repository or connected to an existing remote?
 
 ## Work-session log
+
+### 2026-08-18 — PM-0 build and emulator validation
+
+Outcome:
+
+- Traced `spatialbundle.exe` exit `0xC0000135` through its transitive PE dependencies and identified missing-at-runtime `nanobind.dll`, imported by `spatial.foundation.dll`.
+- Confirmed `nanobind.dll` is installed under `...\editor\SpatialEditor` while the packager runs from `...\editor\spatialbundle`.
+- Used a process-local `PATH` addition to validate the packager without hard-coding the workstation SDK path into the repository.
+- Created CLI-managed AVD `Pico_MVP`, installed the debug APK, launched the sample, and exercised the planar home, Furniture Library, PICO Art Print volumetric inspection, Full Space entry, and Full Space exit.
+- Completed a fresh Android Studio Gradle sync without an unresolved error.
+- Inventoried the five existing catalog/Stage objects and accepted stable IDs `xr_headset`, `vase`, `headphones`, `art_print`, and `desk_lamp` for the first slice.
+
+Validation:
+
+- `spatialbundle.exe --help` exits `0` when the installed `SpatialEditor` directory is on `PATH`.
+- `:editor-asset:spatial_pack_task --no-daemon` passes and generates `editor-asset.bundle`.
+- `spotlessCheck test :app:assembleDebug --no-daemon` passes in 1 minute 8 seconds; the current modules contain no unit-test sources, so their test tasks report `NO-SOURCE` rather than executing test cases.
+- `pico-cli emulator doctor --format json` reports `SUCCESS`.
+- `Pico_MVP` booted completely as `emulator-5554`; app `com.pico.spatial.sample.welcomespace` version `6.0.0` installed and reported `running: true` after launch.
+- `captures/pm0-baseline-2026-08-18.png` exists locally and visibly contains the Welcome Space planar panel; the capture directory is ignored by Git.
+- The app crash buffer returned no entries. Error-level emulator/Spatial runtime diagnostics were present but did not terminate the app.
+- The five model cards map to standalone preview scenes and Full Space nodes under `Dynamic_Group`; Stage entry exercised the required lookup for every configured node without failure.
+
+Next:
+
+- Begin `PM-1` by adding the stable product object mapping and pure catalog/selection/snapshot tests before changing Stage UI.
+
+### 2026-08-18 — Consolidated Project 01 requirements
+
+Outcome:
+
+- Consolidated the accepted `PM-0` through `PM-3` MVP requirements into a dated section of `PROJECT_01_ROOM_QUEST.md` and removed the standalone requirements file.
+- Established `PROJECT_01_ROOM_QUEST.md` as the single Project 01 planning document; future requirements, experiments, decisions, and checkpoints will be added there under dated sections.
+- Defined separate contracts for conversation input/output, fixture/live brain implementations, semantic scene context, reviewed language content, and validated spatial intents.
+- Defined typed deterministic, live typed, speech-output, and microphone-spike test stages.
+- Added the simulator runbook, brain contract cases, test layers, MVP boundaries, exit criteria, and open decisions.
+
+Validation:
+
+- Reviewed the requirements against current Welcome Space planar, Stage, ViewModel, ECS, object-catalog, placement, and lifecycle patterns.
+- Reviewed official PICO guidance for emulator keyboard input, eye/pinch and controller interaction, recording, spatial/audio debugging, multimodal feedback, and comfort.
+- PICO's public Emulator UI guidance reviewed in this session does not establish host microphone capture behavior; that capability remains an explicit measured spike.
+- No Kotlin code, Gradle dependency, model provider, build, emulator, microphone, or live AI behavior was changed or tested in this documentation session.
+
+Next:
+
+- Begin `PM-1` with the stable product object mapping and pure catalog/selection/snapshot tests before adding product UI.
 
 ### 2026-08-18 — GitHub repository publication
 
