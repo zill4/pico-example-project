@@ -1,0 +1,45 @@
+<!--
+  Copyright 2025 - 2026 PICO. All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<resources>
+    <string name="app_name">WelcomeSpace</string>
+    <string name="homepage_description">A showcase of a Spatial Application. Explore the core concepts of SpatialContainer and enjoy the immersive journey! Browse Furniture: Discover Planar and Volumetric containers and how 2D/3D content is organized. Enter Room: Use the Stage container to experience interactive features in an immersive space.</string>
+    <string name="homepage_button_browse_furniture">Browse Furniture</string>
+    <string name="homepage_button_enter_room">Enter Room</string>
+    <string name="decorate_space_title">Decorate Space</string>
+    <string name="furniture_library_title">Furniture Library</string>
+    <string name="item_name_headset">PICO XR Headset</string>
+    <string name="item_name_vase">Modern Designer Vase</string>
+    <string name="item_name_earphones">Noise-Cancelling Headphones</string>
+    <string name="item_name_painting">PICO Art Print</string>
+    <string name="item_name_lamp">Minimalist Desk Lamp</string>
+    <string name="item_description_headset">Sculpted with fluid curves, it redefines perception—seamlessly blending the virtual with the real.</string>
+    <string name="item_description_vase">Glacial facets embody sculpted precision and natural grace.</string>
+    <string name="item_description_earphones">Minimal design, pure acoustics, quieting noise for mental flow.</string>
+    <string name="item_description_lamp">Light and shadow distilled into a gentle touch of elegance.</string>
+    <string name="item_description_painting">Geometric lines and white backdrop create refined visual tension.</string>
+    <string name="item_state_viewing">Viewing</string>
+    <string name="item_state_added">Added</string>
+    <string name="furniture_library_subtitle">Click the view button to inspect furniture models</string>
+    <string name="decorate_space_subtitle">Click the add button to place furniture in your space</string>
+    <string name="nav_back">Back</string>
+    <string name="check_item">Check item</string>
+    <string name="add_item">Add item</string>
+    <string name="homepage_title">Welcome Space</string>
+    <string name="display_option_rotate">Rotate around Y axis</string>
+    <string name="display_option_light">Light the item</string>
+    <string name="display_option_name_tag">Show name tag</string>
+    <string name="display_option_reset_transform">Reset item\'s transform</string>
+</resources>

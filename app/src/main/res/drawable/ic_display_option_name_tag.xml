@@ -1,0 +1,30 @@
+<!--
+  Copyright 2025 - 2026 PICO. All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="21dp"
+    android:height="21dp"
+    android:viewportWidth="21"
+    android:viewportHeight="21">
+  <path
+      android:pathData="M10.5,0C4.701,0 0,4.701 0,10.5C0,16.299 4.701,21 10.5,21C16.299,21 21,16.299 21,10.5C21,4.701 16.299,0 10.5,0ZM10.5,18.9C5.861,18.9 2.1,15.139 2.1,10.5C2.1,5.861 5.861,2.1 10.5,2.1C15.139,2.1 18.9,5.861 18.9,10.5C18.9,15.139 15.139,18.9 10.5,18.9Z"
+      android:fillColor="#000000"/>
+  <path
+      android:pathData="M9.969,8.434C10.186,8.326 11.922,7.492 11.595,8.4C11.245,9.372 10.933,10.358 10.659,11.354C10.475,12.022 10.309,12.694 10.167,13.371C10.124,13.579 9.544,15.861 10.295,15.369C10.648,15.138 11.156,14.744 11.703,14.119C11.856,13.944 12.142,14.09 12.087,14.315C11.936,14.919 11.524,15.788 10.417,16.585C9.645,17.141 8.629,16.593 8.501,15.7C8.317,14.418 8.573,12.972 8.801,11.712C8.922,11.046 9.069,10.386 9.228,9.729C9.354,9.213 9.445,8.693 9.969,8.434Z"
+      android:fillColor="#000000"/>
+  <path
+      android:pathData="M11.025,6.65C11.701,6.65 12.25,6.102 12.25,5.425C12.25,4.748 11.701,4.2 11.025,4.2C10.349,4.2 9.8,4.748 9.8,5.425C9.8,6.102 10.349,6.65 11.025,6.65Z"
+      android:fillColor="#000000"/>
+</vector>

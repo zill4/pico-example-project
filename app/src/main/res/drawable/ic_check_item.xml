@@ -1,0 +1,25 @@
+<!--
+  Copyright 2025 - 2026 PICO. All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+  <path
+      android:pathData="M1.972,8.503C1.496,9.443 1.496,10.557 1.972,11.497C3.533,14.579 6.543,16.667 10,16.667C13.457,16.667 16.467,14.579 18.029,11.497C18.504,10.557 18.504,9.443 18.029,8.503C16.467,5.421 13.457,3.333 10,3.333C6.543,3.333 3.533,5.421 1.972,8.503ZM10,7.5C11.38,7.5 12.5,8.619 12.5,10C12.5,11.38 11.38,12.5 10,12.5C8.619,12.5 7.5,11.38 7.5,10C7.5,8.619 8.619,7.5 10,7.5ZM10,14.167C12.301,14.167 14.167,12.301 14.167,10C14.167,7.699 12.301,5.834 10,5.834C7.699,5.834 5.834,7.699 5.834,10C5.834,12.301 7.699,14.167 10,14.167Z"
+      android:fillColor="#000000"
+      android:fillType="evenOdd"/>
+</vector>

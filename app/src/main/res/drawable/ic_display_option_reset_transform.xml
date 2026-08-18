@@ -1,0 +1,24 @@
+<!--
+  Copyright 2025 - 2026 PICO. All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+  <path
+      android:pathData="M1.667,10C1.667,14.602 5.398,18.333 10,18.333C14.602,18.333 18.333,14.602 18.333,10C18.333,5.398 14.602,1.667 10,1.667C7.911,1.667 6.001,2.435 4.539,3.705L3.211,2.378C2.949,2.115 2.5,2.301 2.5,2.673V6.25C2.5,6.48 2.687,6.667 2.917,6.667H6.494C6.865,6.667 7.051,6.218 6.789,5.955L5.721,4.888C6.879,3.917 8.371,3.333 10,3.333C13.682,3.333 16.667,6.318 16.667,10C16.667,13.682 13.682,16.667 10,16.667C6.318,16.667 3.333,13.682 3.333,10H1.667Z"
+      android:fillColor="#000000"/>
+</vector>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2025 - 2026 PICO. All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<resources>
+    <string name="app_name">WelcomeSpace</string>
+    <string name="homepage_description">空间应用小试牛刀。了解空间容器的概念、打造交互式、沉浸式的体验！ 浏览家具：探索 Planar 与 Volumetric 类型的容器，以及 2D/3D 内容的组织形式。 进入房间：运用 Stage 容器，探索沉浸空间的交互特性。</string>
+    <string name="homepage_button_browse_furniture">浏览家具</string>
+    <string name="homepage_button_enter_room">进入房间</string>
+    <string name="decorate_space_title">装饰空间</string>
+    <string name="furniture_library_title">家具模型</string>
+    <string name="item_name_headset">PICO XR 头显</string>
+    <string name="item_name_vase">现代设计师花瓶</string>
+    <string name="item_name_earphones">降噪耳机</string>
+    <string name="item_name_painting">PICO 装饰画</string>
+    <string name="item_name_lamp">极简风格台灯</string>
+    <string name="item_description_headset">以流畅曲线勾勒未来形态，重塑感知边界，让虚拟与真实无缝交融。</string>
+    <string name="item_description_vase">以冰川为灵感的切割棱面，兼具雕塑感与自然意象。</string>
+    <string name="item_description_earphones">声学匠心融于简约设计，隔绝喧嚣，打造专注自我的沉浸声场。</string>
+    <string name="item_description_lamp">凝练光影叙事，为空间注入一抹恰到好处的温柔。</string>
+    <string name="item_description_painting">干练的几何线条，留白的艺术意境，构建视觉张力。</string>
+    <string name="item_state_viewing">查看中</string>
+    <string name="item_state_added">已添加</string>
+    <string name="furniture_library_subtitle">点击按钮，查看模型细节</string>
+    <string name="decorate_space_subtitle">点击按钮，将物品添加至空间中</string>
+    <string name="nav_back">返回</string>
+    <string name="check_item">查看物品</string>
+    <string name="add_item">添加物品</string>
+    <string name="homepage_title">Welcome Space</string>
+    <string name="display_option_rotate">绕竖轴旋转</string>
+    <string name="display_option_light">为物品打光</string>
+    <string name="display_option_name_tag">显示名称</string>
+    <string name="display_option_reset_transform">重置 transform 值</string>
+</resources>

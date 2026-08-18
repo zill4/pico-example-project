@@ -1,0 +1,25 @@
+{
+    "authoredConfig": true,
+    "textureConverter": {
+        "anisotropy": 1,
+        "col": 8192,
+        "compressionQuality": 0,
+        "cubemapMode": 1,
+        "generateMipmap": true,
+        "maxSize": 4096,
+        "mipmapMode": 0,
+        "resizeFilter": 2,
+        "row": 8192,
+        "samplesPerPixel": 1024,
+        "sourceColorSpace": 17,
+        "targetColorSpace": 273,
+        "textureFilterMode": 3,
+        "textureFormat": 30,
+        "textureShape": 0,
+        "textureType": 0,
+        "textureWrapMode": 1
+    },
+    "textureMemorySize": 89478484,
+    "textureRawHeight": 8192,
+    "textureRawWidth": 8192
+}
