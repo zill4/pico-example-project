@@ -23,14 +23,13 @@ Establish a reproducible PICO OS 6 baseline and execute Project 01 from Spatial 
 
 Immediate next actions:
 
-1. Publish the initial project baseline to `https://github.com/zill4/pico-example-project.git` without force-overwriting remote history.
-2. Diagnose PICO `spatialbundle.exe` exit `0xC0000135`; formatting passes, but tests/debug assembly cannot complete until the missing Windows runtime dependency is resolved.
-3. Open the project in Android Studio `2025.1.4` and confirm Gradle sync is clean.
-4. Start the `Pico` AVD, deploy the unmodified app, and record the result.
-5. Sign in to PICO Developer Center if needed and record only whether access works; never record credentials.
-6. Start a new Codex session from this project and verify that the installed PICO skills plus `pico-dev-knowledge` and `pico-spatial-editor` MCP tools are exposed.
-7. Complete `PM-0 — Reproducible Baseline` in `PROJECT_01_ROOM_QUEST.md` and save build/emulator evidence.
-8. Inventory the room objects, scene names, target nodes, and placement/highlight code needed for `PM-1`.
+1. Diagnose PICO `spatialbundle.exe` exit `0xC0000135`; formatting passes, but tests/debug assembly cannot complete until the missing Windows runtime dependency is resolved.
+2. Open the project in Android Studio `2025.1.4` and confirm Gradle sync is clean.
+3. Start the `Pico` AVD, deploy the unmodified app, and record the result.
+4. Sign in to PICO Developer Center if needed and record only whether access works; never record credentials.
+5. Start a new Codex session from this project and verify that the installed PICO skills plus `pico-dev-knowledge` and `pico-spatial-editor` MCP tools are exposed.
+6. Complete `PM-0 — Reproducible Baseline` in `PROJECT_01_ROOM_QUEST.md` and save build/emulator evidence.
+7. Inventory the room objects, scene names, target nodes, and placement/highlight code needed for `PM-1`.
 
 ## Verified local baseline
 
@@ -92,7 +91,7 @@ Snapshot captured on 2026-08-18. Paths and host details in this section are loca
 - [x] `editor-asset` contains the Spatial Editor project and USD/USDZ-style scene assets used to build `editor-asset.bundle`.
 - [x] `start-pico-emulator.bat` starts the `Pico` AVD with the PICO emulator distribution rather than Android Studio's stock emulator.
 - [~] Generated `app/build` and `editor-asset/build` output exists, but a fresh build was not run during this documentation pass.
-- [x] This folder is initialized as a Git repository on `main`, with `origin` set to `https://github.com/zill4/pico-example-project.git`.
+- [x] This folder is a Git repository on `main`, tracking `origin/main` at `https://github.com/zill4/pico-example-project.git`; the initial baseline was published in commit `f1ef28f`.
 
 ## PICO OS 6 context
 
@@ -358,7 +357,7 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 
 ## Work-session log
 
-### 2026-08-18 — GitHub publication preflight
+### 2026-08-18 — GitHub repository publication
 
 Outcome:
 
@@ -367,18 +366,22 @@ Outcome:
 - Initialized this folder on `main` and connected `origin` to `https://github.com/zill4/pico-example-project.git`.
 - Added `.tga` to the existing Git LFS policy before staging the full project.
 - Staged 180 project files; 53 binary assets use LFS, including all 26 worktree files larger than 10 MB.
+- Committed the baseline as `f1ef28f` (`Initialize PICO Room Quest project`) and pushed `main` without force to the empty target repository.
+- Uploaded all 53 LFS objects, approximately 1.0 GB in total.
 
 Validation:
 
 - `git --version` returned `2.52.0.windows.1`.
 - `gh auth status` succeeded, and repository inspection reported `isEmpty: true` with `ADMIN` permission.
 - `local.properties`, IDE state, Gradle caches, and generated build outputs remain ignored.
+- GitHub reports `main` as the default branch, and the local and remote commit IDs both resolve to `f1ef28f3936bd0ae84fec966f28f96c3228612a4`.
+- `git lfs fsck` passes.
 - `spotlessCheck` passes after applying the repository's native Windows line-ending format.
 - The combined `test` and `:app:assembleDebug` run reached `:editor-asset:spatial_pack_task`, where PICO `spatialbundle.exe` exited with Windows code `-1073741515` (`0xC0000135`). Tests and debug assembly therefore remain incomplete pending runtime-dependency diagnosis.
 
 Next:
 
-- Commit and push the initial baseline, then diagnose the Spatial bundle tool dependency before marking `PM-0` complete.
+- Diagnose the Spatial bundle tool dependency before marking `PM-0` complete.
 
 ### 2026-08-18 — Project 01 roadmap
 
