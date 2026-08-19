@@ -33,8 +33,12 @@
     <string name="item_description_painting">干练的几何线条，留白的艺术意境，构建视觉张力。</string>
     <string name="item_state_viewing">查看中</string>
     <string name="item_state_added">已添加</string>
+    <string name="item_state_in_room">已在房间中</string>
+    <string name="item_state_selected">已选择</string>
+    <string name="item_state_unavailable">不可用</string>
     <string name="furniture_library_subtitle">点击按钮，查看模型细节</string>
-    <string name="decorate_space_subtitle">点击按钮，将物品添加至空间中</string>
+    <string name="decorate_space_subtitle">添加物品后，在房间中指向并点击即可选择或取消选择</string>
+    <string name="reset_room">重置房间</string>
     <string name="nav_back">返回</string>
     <string name="check_item">查看物品</string>
     <string name="add_item">添加物品</string>

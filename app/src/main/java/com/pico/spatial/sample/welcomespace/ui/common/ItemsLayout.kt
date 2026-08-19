@@ -28,14 +28,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.pico.spatial.sample.welcomespace.data.ModelCard
+import com.pico.spatial.sample.welcomespace.data.RoomObjectId
+import com.pico.spatial.sample.welcomespace.data.RoomObjectStatus
 
 @Composable
 fun ItemsLayout(
     mode: ItemInteractionMode,
     items: List<ModelCard>,
-    selectionMap: Map<String, Boolean>,
+    itemStates: Map<RoomObjectId, RoomObjectStatus>,
     previewsEnabled: Boolean = true,
-    onSelect: (modelName: String, title: String) -> Unit,
+    onSelect: (objectId: RoomObjectId, title: String) -> Unit,
 ) {
     Row(modifier = Modifier.size(1216.dp, 572.dp)) {
         val leftSingleItem = items.first()
@@ -52,10 +54,11 @@ fun ItemsLayout(
                 if (mode == ItemInteractionMode.CHECK_DETAIL) DpSize(24.dp, 24.dp)
                 else DpSize(20.dp, 20.dp),
             modelBoundingBoxSize = leftSingleItem.modelBoundingBoxSize,
+            objectId = leftSingleItem.objectId,
             modelName = leftSingleItem.targetItemSceneName,
             title = stringResource(leftSingleItem.titleResourceId),
             description = stringResource(leftSingleItem.descriptionResourceId),
-            isSelected = selectionMap[leftSingleItem.targetItemSceneName] ?: false,
+            itemStatus = itemStates[leftSingleItem.objectId] ?: RoomObjectStatus.UNAVAILABLE,
             previewEnabled = previewsEnabled,
             onSelect = onSelect,
         )
@@ -66,14 +69,15 @@ fun ItemsLayout(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(28.dp)
         ) {
-            items(items.subList(1, ITEM_COUNT), key = { it.targetItemSceneName }) { item ->
+            items(items.drop(1), key = { it.objectId.value }) { item ->
                 ItemModelCard(
                     mode = mode,
                     modelBoundingBoxSize = item.modelBoundingBoxSize,
+                    objectId = item.objectId,
                     modelName = item.targetItemSceneName,
                     title = stringResource(item.titleResourceId),
                     description = stringResource(item.descriptionResourceId),
-                    isSelected = selectionMap[item.targetItemSceneName] ?: false,
+                    itemStatus = itemStates[item.objectId] ?: RoomObjectStatus.UNAVAILABLE,
                     previewEnabled = previewsEnabled,
                     onSelect = onSelect,
                 )
@@ -81,5 +85,3 @@ fun ItemsLayout(
         }
     }
 }
-
-private const val ITEM_COUNT = 5

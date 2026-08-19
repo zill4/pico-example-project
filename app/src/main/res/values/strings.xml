@@ -32,8 +32,12 @@
     <string name="item_description_painting">Geometric lines and white backdrop create refined visual tension.</string>
     <string name="item_state_viewing">Viewing</string>
     <string name="item_state_added">Added</string>
+    <string name="item_state_in_room">In room</string>
+    <string name="item_state_selected">Selected</string>
+    <string name="item_state_unavailable">Unavailable</string>
     <string name="furniture_library_subtitle">Click the view button to inspect furniture models</string>
-    <string name="decorate_space_subtitle">Click the add button to place furniture in your space</string>
+    <string name="decorate_space_subtitle">Add an item, then point and tap it in the room to select or deselect</string>
+    <string name="reset_room">Reset room</string>
     <string name="nav_back">Back</string>
     <string name="check_item">Check item</string>
     <string name="add_item">Add item</string>

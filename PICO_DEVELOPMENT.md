@@ -23,12 +23,10 @@ Establish a reproducible PICO OS 6 baseline and execute Project 01 from Spatial 
 
 Immediate next actions:
 
-1. Begin `PM-1` with a product-level room-object record for `xr_headset`, `vase`, `headphones`, `art_print`, and `desk_lamp`.
-2. Add pure catalog, selection, scene-snapshot, and invalid-ID tests before changing product UI.
-3. Add Stage selection, focus feedback, reset, and unavailable-object behavior while preserving container lifecycle cleanup.
-4. Draft and review Japanese content records for the five stable IDs, including pronunciation provenance.
-5. Sign in to PICO Developer Center if needed and record only whether access works; never record credentials.
-6. Verify `pico-dev-knowledge` and `pico-spatial-editor` MCP calls when those configured tools are exposed by the host.
+1. Complete `PM-1` direct selection evidence with a manual PICO Emulator click or physical controller: select and deselect three placed models and capture the `RoomScene` logs and `Selected` labels.
+2. Reconfirm reset and Stage exit after the direct select/deselect run, then mark `PM-1` complete only if every checkpoint has evidence.
+3. Draft and review Japanese content records for the five stable IDs, including pronunciation provenance, without beginning `PM-2` implementation yet.
+4. Sign in to PICO Developer Center if needed and record only whether access works; never record credentials.
 
 ## Verified local baseline
 
@@ -351,6 +349,11 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 | D-011 | 2026-08-18 | Accepted | Keep all Project 01 planning, requirements, experiments, decisions, and checkpoints in `PROJECT_01_ROOM_QUEST.md` under dated sections. | One navigable product history avoids Markdown-file bloat; future work should update this document instead of creating additional `PROJECT_01*.md` files. |
 | D-012 | 2026-08-18 | Accepted | Add the installed `SpatialEditor` directory to the current build process `PATH` on this workstation instead of changing portable Gradle configuration. | This resolves PICO Editor `6.0.0`'s sibling `nanobind.dll` lookup failure while keeping machine-local SDK paths out of source control. |
 | D-013 | 2026-08-18 | Accepted | Use `xr_headset`, `vase`, `headphones`, `art_print`, and `desk_lamp` as the first stable product IDs, mapped to the existing five catalog scenes and Full Space nodes. | Editor names such as `PicoEquipment` and `PicoEarphone` are implementation details and should not leak into AI prompts, tests, or persisted product state. |
+| D-014 | 2026-08-18 | Accepted | Put virtual-scene discovery behind a minimal `PerceptionProvider` that emits semantic object IDs. | The emulator can supply deterministic known-entity snapshots now, while a later device provider can change sensing without changing product identity or claiming camera recognition. |
+| D-015 | 2026-08-18 | Accepted | Keep deterministic room-session state in the domain/ViewModel path and use ECS components for runtime hit testing and visual feedback. | Product state remains unit-testable and does not depend on transient `Entity` wrapper instances; Stage transforms and high-frequency interaction stay in the scene path. |
+| D-016 | 2026-08-18 | Accepted | Generate runtime box colliders from each model's actual visual bounds and add PICO `InteractableComponent` and `HoverEffectComponent`. | The existing editor assets remain untouched, all five current objects get consistent focus affordances, and the interaction seam can be removed during Stage cleanup. |
+| D-017 | 2026-08-18 | Accepted | Resolve gesture targets with the SDK entity UUID and target the loaded room hierarchy with `TargetEntity.hit(roomRoot)`. | Callback wrappers should not become product identity, and hierarchy targeting covers interactable descendants of the single room entity added to `SpatialView`. |
+| D-018 | 2026-08-18 | Accepted | Keep `PM-1` in progress until a direct 3D select/deselect callback is evidenced. | Automated emulator input produced visible hover, placement, reset, and exit evidence but no tap callback; build success and hover alone do not prove selection. |
 
 ## Open questions
 
@@ -361,6 +364,28 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 - Should the sample package/application ID and product branding remain until after the first prototype?
 
 ## Work-session log
+
+### 2026-08-18 — PM-1 spatial object foundation
+
+Outcome:
+
+- Added the five-object semantic catalog, strict IDs, centralized editor bindings, virtual `PerceptionProvider`, deterministic room session, and pure catalog/session tests.
+- Reworked furniture/decorate UI boundaries to use stable product IDs and explicit `In room`, `Selected`, and `Unavailable` labels, with an explicit room reset action.
+- Added bounds-derived collision, interactable and hover ECS components to the five runtime model entities, persistent Fresnel selection feedback, a room-hierarchy tap recognizer, and owner-based Stage/IBL cleanup.
+- Used the PICO Spatial SDK skill guidance and local official SDK `6.0` documentation for collision/interactable requirements, `SpatialView` gesture wiring, hierarchy targeting, hover feedback, and lifecycle cleanup. No Spatial Editor content edit was required.
+- The PICO development knowledge MCP was callable in this session and was used to cross-check the official tap and `SpatialView` patterns.
+
+Validation:
+
+- Focused `:app:testDebugUnitTest` passes for the new catalog/session cases.
+- The PICO SpatialUI design-style verifier passes with zero errors and zero warnings.
+- `spotlessApply spotlessCheck test :app:assembleDebug --no-daemon` passes on the final tree in 1 minute 17 seconds (109 tasks), including the new catalog/session tests; the resulting APK was installed in PICO Emulator `6.0.0`.
+- Emulator logs confirmed five available room objects, stable-ID placement, and reset. The placed headset visibly received the PICO hover effect; reset hid it and restored the add action; Stage exit returned to Welcome Space; process `10452` remained alive and the crash buffer was empty.
+- Direct 3D selection is not verified. Left-controller and Eye Gesture automation both focused the placed model but produced no `detectSpatialTapGesture` callback, so select/deselect and the three-object selection checkpoint remain open.
+
+Next:
+
+- Perform one manual emulator click (or physical-controller input) on the hovered headset and inspect `RoomScene` for `PM-1 tap [xr_headset]`; verify select and deselect for three objects, capture the `Selected` text state, then repeat reset and exit before completing `PM-1`.
 
 ### 2026-08-18 — PM-0 build and emulator validation
 

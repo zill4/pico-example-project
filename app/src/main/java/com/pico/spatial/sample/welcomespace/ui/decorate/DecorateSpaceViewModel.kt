@@ -16,25 +16,24 @@
 package com.pico.spatial.sample.welcomespace.ui.decorate
 
 import androidx.lifecycle.ViewModel
+import com.pico.spatial.sample.welcomespace.data.RoomObjectId
+import com.pico.spatial.sample.welcomespace.data.RoomSessionState
 import com.pico.spatial.sample.welcomespace.di.DecorateSpaceScope
-import com.pico.spatial.sample.welcomespace.ui.common.ItemSelector
-import com.pico.spatial.sample.welcomespace.ui.common.ItemSelectorImpl
 import com.pico.spatial.sample.welcomespace.ui.room.FullSpaceRoomViewModel
+import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.inject
 
-class DecorateSpaceViewModel :
-    ViewModel(), KoinScopeComponent by DecorateSpaceScope(), ItemSelector by ItemSelectorImpl() {
+class DecorateSpaceViewModel : ViewModel(), KoinScopeComponent by DecorateSpaceScope() {
     private val roomViewModel: FullSpaceRoomViewModel by inject()
+    val sessionState: StateFlow<RoomSessionState> = roomViewModel.sessionState
 
-    fun placeTargetItem(modelName: String) {
-        select(modelName)
-        roomViewModel.showTargetItem(modelName)
-    }
+    fun placeTargetItem(objectId: RoomObjectId) = roomViewModel.placeTargetItem(objectId)
+
+    fun resetRoom() = roomViewModel.resetRoom()
 
     override fun onCleared() {
         super.onCleared()
-        deselectAll()
         scope.close()
     }
 }

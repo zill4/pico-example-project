@@ -49,6 +49,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pico.spatial.sample.welcomespace.R
+import com.pico.spatial.sample.welcomespace.data.RoomObjectId
+import com.pico.spatial.sample.welcomespace.data.RoomObjectStatus
 import com.pico.spatial.sample.welcomespace.data.assetBundle
 import com.pico.spatial.ui.design.Button
 import com.pico.spatial.ui.design.ButtonDefaults
@@ -84,12 +86,13 @@ fun ItemModelCard(
         if (mode == ItemInteractionMode.CHECK_DETAIL) DpSize(18.dp, 18.dp)
         else DpSize(16.dp, 16.dp),
     modelBoundingBoxSize: DpSize,
+    objectId: RoomObjectId,
     modelName: String,
     title: String,
     description: String,
-    isSelected: Boolean = false,
+    itemStatus: RoomObjectStatus = RoomObjectStatus.AVAILABLE,
     previewEnabled: Boolean = true,
-    onSelect: (modelName: String, title: String) -> Unit,
+    onSelect: (objectId: RoomObjectId, title: String) -> Unit,
 ) {
     val context = LocalContext.current
     var dragAmount by remember { mutableStateOf(Offset3D.Zero) }
@@ -119,9 +122,16 @@ fun ItemModelCard(
                         Modifier.size(modelBoundingBoxSize)
                             .requiredDepth(modelDepth)
                             .clip(RoundedCornerShape(8.dp))
-                            .alpha(if (!isSelected) 1f else 0.6f)
+                            .alpha(
+                                when (itemStatus) {
+                                    RoomObjectStatus.AVAILABLE -> 1f
+                                    RoomObjectStatus.UNAVAILABLE -> 0.35f
+                                    RoomObjectStatus.IN_ROOM,
+                                    RoomObjectStatus.SELECTED -> 0.6f
+                                }
+                            )
                             .pointerInput(Unit) {
-                                if (!isSelected) {
+                                if (itemStatus == RoomObjectStatus.AVAILABLE) {
                                     detectSpatialDragGesture(
                                         context = context,
                                         onDragEnd = { shouldClearDrag = true },
@@ -136,7 +146,7 @@ fun ItemModelCard(
                                 }
                             }
                             .rotate3D {
-                                if (!shouldClearDrag && !isSelected) {
+                                if (!shouldClearDrag && itemStatus == RoomObjectStatus.AVAILABLE) {
                                     dragAmount.toRotation3D(SENSITIVITY)
                                 } else {
                                     Offset3D.Zero.toRotation3D(SENSITIVITY).apply {
@@ -190,10 +200,10 @@ fun ItemModelCard(
                         containerColor = Color.Vibrant.withVibrant(Vibrant.Light),
                         contentColor = colorScheme.fillPrimary
                     ),
-                onClick = { onSelect(modelName, title) },
-                enabled = !isSelected, // prevent re-selecting
+                onClick = { onSelect(objectId, title) },
+                enabled = itemStatus == RoomObjectStatus.AVAILABLE,
             ) {
-                if (!isSelected) {
+                if (itemStatus == RoomObjectStatus.AVAILABLE) {
                     Icon(
                         imageVector =
                             ImageVector.vectorResource(
@@ -212,7 +222,16 @@ fun ItemModelCard(
                         text =
                             if (mode == ItemInteractionMode.CHECK_DETAIL)
                                 stringResource(R.string.item_state_viewing)
-                            else stringResource(R.string.item_state_added),
+                            else
+                                stringResource(
+                                    when (itemStatus) {
+                                        RoomObjectStatus.IN_ROOM -> R.string.item_state_in_room
+                                        RoomObjectStatus.SELECTED -> R.string.item_state_selected
+                                        RoomObjectStatus.UNAVAILABLE ->
+                                            R.string.item_state_unavailable
+                                        RoomObjectStatus.AVAILABLE -> R.string.add_item
+                                    }
+                                ),
                         fontSize = 12.sp,
                         fontWeight = FontWeight(600),
                         lineHeight = 16.sp,

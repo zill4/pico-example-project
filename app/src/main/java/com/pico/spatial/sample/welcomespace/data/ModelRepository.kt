@@ -17,66 +17,49 @@ package com.pico.spatial.sample.welcomespace.data
 
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import com.pico.spatial.sample.welcomespace.R
 
-// Name of USDA scenes to be loaded and displayed in Furniture Library and Display Volume
-private const val SCENE_EARPHONE = "PicoEarphone"
-private const val SCENE_EQUIPMENT = "PicoEquipment"
-private const val SCENE_LAMP = "PicoDeskLamp"
-private const val SCENE_PAINTING = "PicoPainting"
-private const val SCENE_VASE = "PicoVase"
 const val SCENE_ROOM = "WelcomeSpace_VR"
-
-// Name of items to be added into the full-space Room
-private const val NODE_EARPHONE = "SM_Picoearphone_001"
-private const val NODE_EQUIPMENT = "SM_Picoequipment_001"
-private const val NODE_LAMP = "SM_Picodesklamp_001"
-private const val NODE_PAINTING = "SM_PicoPainting_001"
-private const val NODE_VASE = "SM_Picovase_001"
 
 data class ModelCard(
     val modelBoundingBoxSize: DpSize,
-    val targetItemSceneName: String,
-    val titleResourceId: Int,
-    val descriptionResourceId: Int,
-    val targetItemNodeName: String,
-)
+    val roomObject: RoomObject,
+) {
+    val objectId: RoomObjectId
+        get() = roomObject.id
+
+    val targetItemSceneName: String
+        get() = roomObject.sceneReference.sceneEntityName
+
+    val titleResourceId: Int
+        get() = roomObject.displayNameResourceId
+
+    val descriptionResourceId: Int
+        get() = roomObject.descriptionResourceId
+
+    val targetItemNodeName: String
+        get() = roomObject.sceneReference.sceneNodeName
+}
 
 val modelCards =
     listOf(
         ModelCard(
             DpSize(440.dp, 440.dp),
-            SCENE_EQUIPMENT,
-            R.string.item_name_headset,
-            R.string.item_description_headset,
-            NODE_EQUIPMENT,
+            RoomObjectCatalog.require(RoomObjectIds.XR_HEADSET),
         ),
         ModelCard(
             DpSize(180.dp, 180.dp),
-            SCENE_VASE,
-            R.string.item_name_vase,
-            R.string.item_description_vase,
-            NODE_VASE,
+            RoomObjectCatalog.require(RoomObjectIds.VASE),
         ),
         ModelCard(
             DpSize(180.dp, 180.dp),
-            SCENE_EARPHONE,
-            R.string.item_name_earphones,
-            R.string.item_description_earphones,
-            NODE_EARPHONE,
+            RoomObjectCatalog.require(RoomObjectIds.HEADPHONES),
         ),
         ModelCard(
             DpSize(210.dp, 210.dp),
-            SCENE_PAINTING,
-            R.string.item_name_painting,
-            R.string.item_description_painting,
-            NODE_PAINTING,
+            RoomObjectCatalog.require(RoomObjectIds.ART_PRINT),
         ),
         ModelCard(
             DpSize(180.dp, 180.dp),
-            SCENE_LAMP,
-            R.string.item_name_lamp,
-            R.string.item_description_lamp,
-            NODE_LAMP,
+            RoomObjectCatalog.require(RoomObjectIds.DESK_LAMP),
         ),
     )

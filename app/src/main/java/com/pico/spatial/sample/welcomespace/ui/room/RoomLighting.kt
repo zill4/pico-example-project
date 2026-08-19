@@ -28,7 +28,22 @@ import kotlinx.coroutines.withContext
 
 /** ViewModel responsible for providing the Image-Based Light (IBL) entity for the room. */
 class IblViewModel : ViewModel() {
-    val entity = viewModelScope.async { IblEntity().apply { initialize() } }
+    private var loadedEntity: IblEntity? = null
+
+    val entity =
+        viewModelScope.async {
+            IblEntity().apply {
+                initialize()
+                loadedEntity = this
+            }
+        }
+
+    override fun onCleared() {
+        entity.cancel()
+        loadedEntity?.destroy()
+        loadedEntity = null
+        super.onCleared()
+    }
 }
 
 /** Entity that encapsulates the environment lighting components. */

@@ -1,6 +1,6 @@
 # Project 01: Room Quest to Chore Helper
 
-Status: `PM-0` complete; `PM-1` ready to begin
+Status: `PM-0` complete; `PM-1` in progress
 Started: 2026-08-18  
 Current product marker: `PM-1 — Spatial Object Foundation`
 Starting point: PICO Welcome Space `0.13.3`, Spatial SDK `6.0.0`
@@ -51,7 +51,7 @@ Every product marker must:
 | Marker | Product checkpoint | User-visible proof | Target environment | Status |
 | --- | --- | --- | --- | --- |
 | PM-0 | Reproducible Baseline | Unmodified Welcome Space launches and can be recorded | Emulator | [x] |
-| PM-1 | Spatial Object Foundation | User can select, identify, and reset known room objects | Emulator | [ ] |
+| PM-1 | Spatial Object Foundation | User can select, identify, and reset known room objects | Emulator | [~] |
 | PM-2 | “Kore wa nan desuka?” Language Lens | Selected objects reveal an attached label and pronunciation | Emulator | [ ] |
 | PM-3 | Spatial Language Quest | User finds prompted objects and earns progress | Emulator | [ ] |
 | PM-4 | Point-and-Place Challenge | User follows a spatial instruction to move an object to its destination | Emulator | [ ] |
@@ -93,10 +93,10 @@ Checkpoint:
 
 - [ ] At least three objects can be selected reliably in the Stage.
 - [ ] Selected, unselected, and unavailable states are visibly distinct without depending on color alone.
-- [ ] The app exposes stable object identity to product logic without leaking editor-only details throughout the UI.
-- [ ] Reset restores the original object and selection state.
-- [ ] Stage closure cleans up created entities, listeners, resources, and work owned by the feature.
-- [ ] Focused automated tests cover pure object/session state.
+- [x] The app exposes stable object identity to product logic without leaking editor-only details throughout the UI.
+- [x] Reset restores the original object and selection state.
+- [x] Stage closure cleans up created entities, listeners, resources, and work owned by the feature.
+- [x] Focused automated tests cover pure object/session state.
 - [ ] Emulator evidence shows select, deselect, reset, and exit.
 
 Exit artifact: reusable spatial object contract and a recorded three-object interaction demo.
@@ -374,6 +374,21 @@ Add one entry when a marker starts, changes materially, or completes.
 - IDE evidence: Android Studio `2025.1.4` completed a fresh **Sync Project with Gradle Files** operation with no unresolved error. The IDE only offered an optional Android Gradle Plugin upgrade recommendation.
 - Inventory evidence: The five catalog/Stage objects, editor scenes, room nodes, interaction seams, and lifecycle behaviors are recorded in the dated inventory section below.
 - Next: Add the `PM-1` product object record and pure tests for the five stable semantic IDs.
+
+### 2026-08-18 — PM-1 spatial object foundation implementation
+
+- Status: `PM-1` is in progress. The object contract, virtual-scene perception seam, deterministic session state, Stage interaction components, reset, cleanup, and pure tests are implemented. Direct select/deselect evidence is still pending.
+- Product contract: Added validated stable IDs for `xr_headset`, `vase`, `headphones`, `art_print`, and `desk_lamp`, with category, display resources, movable state, optional destination, and centralized mappings to the current editor scene/node names.
+- Perception boundary: Added a minimal `PerceptionProvider` and `VirtualScenePerceptionProvider`; the emulator reports known virtual scene entities only and makes no camera or physical-room recognition claim.
+- Session behavior: Added explicit `AVAILABLE`, `IN_ROOM`, `SELECTED`, and `UNAVAILABLE` states with deterministic place, toggle, reset, unknown-object, and not-in-room results. Product state remains outside the ECS entity wrappers.
+- Stage behavior: The five model entities receive runtime bounding-box colliders, `InteractableComponent`, and `HoverEffectComponent`; the tap recognizer uses a bounded `SpatialView` and targets the loaded room hierarchy. Selected state is designed to combine persistent Fresnel feedback with the planar `Selected` label.
+- UI behavior: Catalog actions and status rendering now use stable product IDs. `In room`, `Selected`, and `Unavailable` labels supplement visual treatments, and the room has an explicit reset action.
+- Lifecycle behavior: Runtime interaction components, selection material handles, loaded room/IBL entities, maps, and deferred work are released by the owning ViewModels. No editor-authored scene or generated build output was manually changed.
+- Automated evidence: `spotlessApply spotlessCheck test :app:assembleDebug --no-daemon` passes on the final tree in 1 minute 17 seconds (109 tasks). Focused catalog/session tests execute successfully. The SpatialUI design verifier passes with zero errors and zero warnings.
+- Emulator evidence: PICO Emulator `6.0.0` loaded all five objects; the UI changed placed objects to `In room`; runtime logs recorded placement and reset; reset hid the placed headset and restored its add action; exiting returned to Welcome Space; the app process remained alive and the crash buffer was empty.
+- Interaction limitation: Both left-controller and Eye Gesture automation produced visible `HoverEffect` focus on the placed headset, but no `detectSpatialTapGesture` callback reached the diagnostic boundary. The official bounded `SpatialView` and `TargetEntity.hit(roomRoot)` hierarchy pattern is now implemented, but select/deselect is deliberately not marked verified until a manual emulator click or physical-device run produces callback/log and state evidence.
+- Local emulator note: `Pico_MVP.avd/controller_settings.ini` maps the left trigger to Qt key code `81` (`Q`). Controller-button mode and ordinary planar activation were exercised, but keyboard and automated pointer injection are not accepted as proof of a 3D tap callback.
+- Next: Manually click a hovered placed model in PICO Emulator (or use a physical device), capture `PM-1 tap [...]` select and deselect logs plus the non-color `Selected` label, then repeat for three models before completing `PM-1`.
 
 ## 2026-08-18 — MVP voice, brain, scene context, and simulator requirements
 

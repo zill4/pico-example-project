@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.dropUnlessResumed
 import com.pico.spatial.sample.welcomespace.R
 import com.pico.spatial.sample.welcomespace.ui.navigation.LocalMainNavController
+import com.pico.spatial.ui.design.Button
 import com.pico.spatial.ui.design.Icon
 import com.pico.spatial.ui.design.IconButton
 import com.pico.spatial.ui.design.IconButtonDefaults
@@ -44,7 +45,11 @@ import com.pico.spatial.ui.foundation.vibrant.withVibrant
 import com.pico.spatial.ui.graphics.Vibrant
 
 @Composable
-fun NavTitleBar(mode: ItemInteractionMode, onBack: (() -> Unit)? = null) {
+fun NavTitleBar(
+    mode: ItemInteractionMode,
+    onBack: (() -> Unit)? = null,
+    onResetRoom: (() -> Unit)? = null,
+) {
     val navController = LocalMainNavController.current
     TitleBar(
         modifier = Modifier.size(1280.dp, 96.dp),
@@ -87,6 +92,16 @@ fun NavTitleBar(mode: ItemInteractionMode, onBack: (() -> Unit)? = null) {
                     contentDescription = stringResource(R.string.nav_back),
                     modifier = Modifier.size(20.dp)
                 )
+            }
+        },
+        trailingActions = {
+            onResetRoom?.let { resetRoom ->
+                Button(
+                    modifier = Modifier.semantics { contentDescription = "reset_room_button" },
+                    onClick = resetRoom,
+                ) {
+                    Text(text = stringResource(R.string.reset_room))
+                }
             }
         },
         titleAlignment = TitleAlignment.CenterInBar

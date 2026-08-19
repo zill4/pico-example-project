@@ -23,11 +23,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pico.spatial.sample.welcomespace.R
 import com.pico.spatial.sample.welcomespace.data.modelCards
 import com.pico.spatial.sample.welcomespace.di.DECORATE_SPACE_SCOPE_ID
@@ -51,6 +53,7 @@ fun DecorateSpacePage(
         )
 ) {
     val navController = LocalMainNavController.current
+    val sessionState by viewModel.sessionState.collectAsStateWithLifecycle()
     val previewExitController = rememberPreviewExitController {
         closeStage()
         awaitFrame()
@@ -70,14 +73,15 @@ fun DecorateSpacePage(
             NavTitleBar(
                 mode = ItemInteractionMode.ADD_TO_SPACE,
                 onBack = previewExitController.requestExit,
+                onResetRoom = viewModel::resetRoom,
             )
             Spacer(modifier = Modifier.height(8.dp))
             ItemsLayout(
                 mode = ItemInteractionMode.ADD_TO_SPACE,
                 items = modelCards,
-                selectionMap = viewModel.selectionMap,
+                itemStates = sessionState.objectStates,
                 previewsEnabled = previewExitController.previewsEnabled,
-                onSelect = { modelName, _ -> viewModel.placeTargetItem(modelName) },
+                onSelect = { objectId, _ -> viewModel.placeTargetItem(objectId) },
             )
         }
     }

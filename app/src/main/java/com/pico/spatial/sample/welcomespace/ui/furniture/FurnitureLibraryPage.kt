@@ -34,6 +34,8 @@ import com.pico.spatial.sample.welcomespace.CROSS_CONTAINER_BUNDLE_MODEL_NAME
 import com.pico.spatial.sample.welcomespace.CROSS_CONTAINER_BUNDLE_TITLE
 import com.pico.spatial.sample.welcomespace.R
 import com.pico.spatial.sample.welcomespace.WINDOW_CONTAINER_DISPLAY_BOX_ID
+import com.pico.spatial.sample.welcomespace.data.RoomObjectCatalog
+import com.pico.spatial.sample.welcomespace.data.RoomObjectStatus
 import com.pico.spatial.sample.welcomespace.data.modelCards
 import com.pico.spatial.sample.welcomespace.di.FURNITURE_LIBRARY_SCOPE_ID
 import com.pico.spatial.sample.welcomespace.ui.common.ItemInteractionMode
@@ -58,6 +60,13 @@ fun FurnitureLibraryPage(
     val navController = LocalMainNavController.current
     val spatialNavigator = LocalSpatialNavigator.current
     val previewExitController = rememberPreviewExitController { navController.popBackStack() }
+    val itemStates =
+        modelCards.associate { card ->
+            card.objectId to
+                if (viewModel.selectionMap[card.targetItemSceneName] == true)
+                    RoomObjectStatus.SELECTED
+                else RoomObjectStatus.AVAILABLE
+        }
 
     fun closeDisplayWindows() {
         viewModel.selectionMap
@@ -86,9 +95,11 @@ fun FurnitureLibraryPage(
             ItemsLayout(
                 mode = ItemInteractionMode.CHECK_DETAIL,
                 items = modelCards,
-                selectionMap = viewModel.selectionMap,
+                itemStates = itemStates,
                 previewsEnabled = previewExitController.previewsEnabled,
-                onSelect = { modelName, title ->
+                onSelect = { objectId, title ->
+                    val modelName =
+                        RoomObjectCatalog.require(objectId).sceneReference.sceneEntityName
                     viewModel.select(modelName)
                     // Open WindowContainer for item display
                     spatialNavigator.openWindowContainer(
