@@ -365,6 +365,27 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 
 ## Work-session log
 
+### 2026-08-18 — One-click PM-1 emulator test launcher
+
+Outcome:
+
+- Replaced the fragile copy/paste logging handoff with root-level `run-pm1-emulator-test.bat` and its tracked PowerShell implementation.
+- The launcher runs the verified Gradle gate, starts `Pico_MVP`, installs and launches the app, resolves its process ID, and attaches the logger before manual room entry.
+- The launcher emits `READY - CLICK ENTER ROOM NOW` only after receiving its first device log line, displays relevant Stage/room events, and writes the full stream to a timestamped ignored `captures/pm1-stage-lifecycle-*.log` file.
+- The script supplies both the PICO Spatial Editor and Android `platform-tools` directories on its process-local `PATH`; no machine path is added to portable Gradle configuration or the user's persistent environment.
+- Updated the single Project 01 runbook to make the batch launcher the default workflow; no manual multiline PowerShell pipeline is required.
+
+Validation:
+
+- The PowerShell implementation passes parser validation, and the required `pico-cli.cmd`, Android platform-tools ADB, and PICO Spatial Editor paths exist on the current workstation.
+- The first real batch run completed the full Gradle gate in 57 seconds (106 tasks), started `Pico_MVP`, installed the APK, and launched the app. Logger startup then exposed that `pico-cli app logcat` calls `adb` by name and therefore needs Android `platform-tools` on `PATH`.
+- After adding that process-local path, the verification rerun reused the online emulator and built APK, reinstalled/launched the app, received an actual device log line, printed the green readiness banner, and began writing `captures/pm1-stage-lifecycle-20260818-203613.log` before room entry.
+- The logger remains active for the manual transition. Room entry/disappearance evidence is not claimed until the user completes that interaction.
+
+Next:
+
+- Complete the active manual transition, stop the logger, then inspect the generated lifecycle log and crash buffer before deciding the overlap root cause.
+
 ### 2026-08-18 — Corrected pre-entry Stage logging
 
 Outcome:

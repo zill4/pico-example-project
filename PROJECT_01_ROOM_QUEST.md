@@ -394,52 +394,30 @@ Add one entry when a marker starts, changes materially, or completes.
 
 Purpose: close the remaining `PM-1` interaction checkpoint with direct simulator evidence. Hover alone is not a pass. A passing selection must change product state, show persistent feedback after the pointer moves away, and log the stable product ID.
 
-#### 1. Build, start, install, and launch
+#### 1. Run the one-click Windows launcher
 
-Run from the repository root in PowerShell:
+Double-click `run-pm1-emulator-test.bat` in the repository root. Do not paste the underlying PowerShell pipeline manually.
 
-```powershell
-$env:JAVA_HOME = 'C:\Program Files\Android\Android Studio\jbr'
-$env:PATH = "$env:LOCALAPPDATA\PICO\sdk\6.0\editor\SpatialEditor;$env:PATH"
-.\gradlew.bat spotlessCheck test :app:assembleDebug --no-daemon
+The launcher and its tracked companion `run-pm1-emulator-test.ps1` will:
 
-pico-cli emulator start --avd Pico_MVP --wait-timeout 180 -y
-pico-cli device list --format json
-$env:PICO_CLI_DEVICE = 'emulator-5554'
-
-pico-cli app install .\app\build\outputs\apk\debug\app-debug.apk
-pico-cli app launch com.pico.spatial.sample.welcomespace --activity .platform.LaunchActivity
-```
+1. run `spotlessCheck`, `test`, and `:app:assembleDebug`;
+2. start the managed `Pico_MVP` emulator and wait for it to boot;
+3. install the verified debug APK;
+4. launch Welcome Space and resolve its process ID;
+5. attach the lifecycle logger; and
+6. save the full log to a timestamped file under ignored `captures/`.
 
 Expected:
 
 - Gradle ends with `BUILD SUCCESSFUL` and the debug APK exists.
 - The device list contains one online `emulator-5554` target.
 - Install and launch commands succeed, and the Welcome Space home panel appears.
-- Stop at the home panel. Do not select **Enter Room** until the logger in the next step prints its explicit attached message.
+- Stop at the home panel. Do not select **Enter Room** until the launcher prints `READY - CLICK ENTER ROOM NOW` in green.
 - The app remains running. A launch command alone is not proof that 3D interaction works.
 
-#### 2. Attach the lifecycle log before entering the room
+#### 2. Wait for confirmed logger attachment
 
-Open a second PowerShell terminal in the repository root:
-
-```powershell
-$env:PICO_CLI_DEVICE = 'emulator-5554'
-$platformAdb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-$appProcessId = (& $platformAdb -s emulator-5554 shell pidof com.pico.spatial.sample.welcomespace).Trim()
-if (-not $appProcessId) { throw 'Welcome Space is not running on emulator-5554.' }
-
-New-Item -ItemType Directory -Force .\captures | Out-Null
-$stageLogPath = Join-Path (Resolve-Path .\captures).Path "pm1-stage-lifecycle-$((Get-Date).ToString('yyyyMMdd-HHmmss')).log"
-"Logger attached before Enter Room; writing $stageLogPath" |
-    Tee-Object -FilePath $stageLogPath
-
-pico-cli app logcat --pid $appProcessId --lines 50 --level I --follow |
-    Select-String -Pattern 'SpatialPack_SpatialContainer|LifeCycle|RoomScene' |
-    Tee-Object -FilePath $stageLogPath -Append
-```
-
-Wait until `Logger attached before Enter Room` is visible, then select **Enter Room** in the emulator. Leave this terminal open during the test and press `Ctrl+C` after evidence is captured.
+The launcher prints its green `READY` banner only after the logger receives its first device log line. Select **Enter Room** only after that banner appears. Leave the launcher window open during the test and press `Ctrl+C` after evidence is captured.
 
 The older `--tag RoomScene` command could appear to start late because the app emits no `RoomScene` messages on the home screen. Its first matching event occurs only after the Stage opens and the room finishes loading. The broader stream above is already attached before entry and also captures Stage open, focus, and close/destroy events.
 
@@ -509,14 +487,9 @@ The bracketed ID changes for each model. Editor names such as `PicoEquipment` ar
 
 Use the PICO Emulator's built-in screen-recording control for the spatial proof. Record one continuous clip containing three object select/deselect cycles, reset, and Stage exit. Save it locally under `captures/`, which is intentionally ignored by Git.
 
-After stopping the live log, collect the recent interaction and crash evidence:
+After stopping the live log, keep the timestamped `captures/pm1-stage-lifecycle-*.log` file. Ask the agent to inspect that file and the current crash buffer; no additional command needs to be pasted manually.
 
-```powershell
-pico-cli app logcat --pid $appProcessId --lines 300 --tag RoomScene --level I
-pico-cli app logcat --pid $appProcessId --buffer crash --lines 200 --level E
-```
-
-Expected: the interaction log contains the scene-ready, placement, select, deselect, and reset lines; the crash-buffer command returns no app crash entry. If a CLI screenshot of the spatial compositor is black, use the emulator's built-in screenshot or recording control instead.
+Expected: the saved log contains the Stage open/lifecycle fields plus scene-ready, placement, select, deselect, and reset lines. The crash buffer should contain no app crash entry. If a CLI screenshot of the spatial compositor is black, use the emulator's built-in screenshot or recording control instead.
 
 #### 7. PM-1 pass/fail rule
 
