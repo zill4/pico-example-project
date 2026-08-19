@@ -365,6 +365,32 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 
 ## Work-session log
 
+### 2026-08-18 — PM-1 placement evidence and overlapping-room diagnosis
+
+Outcome:
+
+- Recorded the user's manual result that add actions made the tested models appear and changed their cards to `In room`.
+- Kept direct selection open because `In room` proves placement, while the required `Selected` label and `PM-1 tap [...]` callback/log evidence were not reported.
+- Investigated the reported overlap between the app room and the emulator's starting room without changing app code, assets, or emulator state.
+
+Validation:
+
+- `pico-cli emulator status` reports the managed PICO Emulator `6.0.0` online as `emulator-5554`; app process `4227` is running.
+- Runtime logs show one Stage named `room`, opened as `FULL` with immersion `100` and `useSystemEnvironment=false`. The Stage is focused, `PM-1 scene ready` reports five objects, and the crash buffer is empty.
+- Repository inspection shows one `WelcomeSpace_VR` load, positioned at `(0.15, 0, -3.6)` with a `-30` degree yaw. No second application Stage or room-scene load was found.
+- Queried the installed PICO OS 6 knowledge graph and SDK API reference. `StageStyle.Full` is documented to take over the display and disable Video See-through; therefore, an emulator base room visible while the Stage remains active is not accepted as intended Full Stage behavior.
+- Captured `captures/pm1-double-room-report-2026-08-18.png` for comparison. The static capture confirms the current Stage/panel state but does not prove the reported disappearance transition.
+- The environment preflight confirmed Node.js `24.13.0`, npm `11.10.1`, public `pico-cli 0.4.2`, healthy emulator and MCP checks, and the already documented contradictory Spatial Editor partial-installation flag. No repair was attempted.
+
+Working diagnosis:
+
+- The finite, interior-facing app room is probably being left behind or viewed from its culled side as the simulated HMD moves. If the emulator then reveals its base-room backdrop despite `useSystemEnvironment=false`, that is likely an emulator compositor/scene-boundary limitation. A transition recording is required before treating this as confirmed.
+
+Next:
+
+- Record the transition while watching whether the Decorate Space panel remains visible, then reset/recenter the emulator viewpoint. Use that result to separate finite-scene/background composition from an unexpected Stage close.
+- Continue the direct selection acceptance pass separately; `PM-1` is not complete until three objects produce `Selected` and `DESELECTED` state/log evidence.
+
 ### 2026-08-18 — PM-1 manual emulator acceptance procedure
 
 Outcome:

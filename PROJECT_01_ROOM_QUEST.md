@@ -526,6 +526,18 @@ Troubleshooting classification:
 
 The explicit `Unavailable` state and invalid-object transitions are already covered by pure tests. A true runtime missing-node proof should use a dedicated future debug fixture; transient loading or destructive asset edits are not accepted substitutes.
 
+### 2026-08-18 — PM-1 manual placement and overlapping-room report
+
+- Status: `PM-1` remains in progress.
+- User-reported evidence: each tested add action made its model appear in the room and changed the product card to `In room`. This is accepted as manual placement feedback, but it does not prove the direct 3D select/deselect callback because no `Selected` label or `PM-1 tap [...]` log was reported.
+- Reported defect: the app-authored room appeared to overlap the emulator's starting simulation room. After moving the simulated viewpoint, the app room disappeared and the starting simulation room became visible.
+- Runtime inspection: the current process is still running without a crash. Logs show exactly one app Stage named `room`, opened with `style:FULL`, `immersion=100`, and `useSystemEnvironment=false`; no second app Stage or second `WelcomeSpace_VR` load was found.
+- Scene inspection: `WelcomeSpace_VR` is loaded once as a finite model and positioned at `(0.15, 0, -3.6)` with a `-30` degree yaw. The app does not intentionally spawn the emulator environment.
+- Current evidence: `captures/pm1-double-room-report-2026-08-18.png` was retained locally for comparison. It shows the Decorate Space panel and app room while the Stage is active; it does not by itself capture the disappearance transition.
+- Working diagnosis: moving the simulated HMD likely crosses outside or behind the finite, interior-facing room shell, causing room surfaces to leave view or be back-face culled. The emulator then exposes its base-room backdrop. PICO's SDK contract says a `Full` Stage should block the underlying real/simulated environment, so backdrop visibility while this Stage remains active should be treated as an emulator compositor/scene-boundary issue rather than expected product behavior. This diagnosis remains provisional until the transition is recorded.
+- Next discriminator test: record the transition and note whether the Decorate Space panel remains visible. If the panel remains, the Stage is alive and the problem is room bounds/back-face/background composition. If the panel disappears or the home panel returns, investigate Stage lifecycle. Use the emulator's view reset/recenter control; if the app room returns immediately, that further supports a viewpoint-versus-finite-scene cause.
+- Product consequence: do not block placement-state work on this symptom, but resolve or visibly contain it before the shareable simulator POC. Likely containment options are a distinct enclosing sky/background mesh and a validated starting viewpoint inside the authored room; neither is implemented or accepted yet.
+
 ## 2026-08-18 — MVP voice, brain, scene context, and simulator requirements
 
 - Status: Accepted requirements baseline; implementation not started
