@@ -454,7 +454,7 @@ Use `xr_headset`, `vase`, and `art_print` unless one is visually inaccessible; a
 
 For each object:
 
-1. On the Welcome Space home panel, select **Enter Room**.
+1. On the Welcome Space home panel, select **Enter Room** before the first object. After resetting between objects, remain in the Stage and continue with the next object.
 2. Wait for the room to finish loading. Do not interact while cards are temporarily `Unavailable`; after `PM-1 scene ready`, all five normal targets should expose their add action.
 3. Select the object's `+` add action. The card must change to `In room`, the model must appear at its authored room position, and the log must contain `PM-1 place [<id>]: APPLIED`.
 4. Aim at the placed model itself—not its card preview—until the temporary hover effect appears.
