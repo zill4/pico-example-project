@@ -23,10 +23,11 @@ Establish a reproducible PICO OS 6 baseline and execute Project 01 from Spatial 
 
 Immediate next actions:
 
-1. Complete `PM-1` direct selection evidence with a manual PICO Emulator click or physical controller: select and deselect three placed models and capture the `RoomScene` logs and `Selected` labels.
-2. Reconfirm reset and Stage exit after the direct select/deselect run, then mark `PM-1` complete only if every checkpoint has evidence.
-3. Draft and review Japanese content records for the five stable IDs, including pronunciation provenance, without beginning `PM-2` implementation yet.
-4. Sign in to PICO Developer Center if needed and record only whether access works; never record credentials.
+1. Run the lifecycle-corrected build, place one model, minimize (`-`) the Decorate Space panel, and verify that the Stage remains open and focused.
+2. Complete `PM-1` direct selection evidence with a manual PICO Emulator click or physical controller: select and deselect three placed models and capture the `RoomScene` logs and `Selected` labels.
+3. Reconfirm reset and intentional Stage exit after the direct select/deselect run, then mark `PM-1` complete only if every checkpoint has evidence.
+4. Draft and review Japanese content records for the five stable IDs, including pronunciation provenance, without beginning `PM-2` implementation yet.
+5. Sign in to PICO Developer Center if needed and record only whether access works; never record credentials.
 
 ## Verified local baseline
 
@@ -354,6 +355,7 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 | D-016 | 2026-08-18 | Accepted | Generate runtime box colliders from each model's actual visual bounds and add PICO `InteractableComponent` and `HoverEffectComponent`. | The existing editor assets remain untouched, all five current objects get consistent focus affordances, and the interaction seam can be removed during Stage cleanup. |
 | D-017 | 2026-08-18 | Accepted | Resolve gesture targets with the SDK entity UUID and target the loaded room hierarchy with `TargetEntity.hit(roomRoot)`. | Callback wrappers should not become product identity, and hierarchy targeting covers interactable descendants of the single room entity added to `SpatialView`. |
 | D-018 | 2026-08-18 | Accepted | Keep `PM-1` in progress until a direct 3D select/deselect callback is evidenced. | Automated emulator input produced visible hover, placement, reset, and exit evidence but no tap callback; build success and hover alone do not prove selection. |
+| D-019 | 2026-08-18 | Accepted | Keep the Full Space Stage open when its planar control panel is minimized; close it only when that WindowContainer is destroyed or through an explicit exit action. | PICO defines `ON_PAUSE`/`ON_STOP` as normal minimize/background transitions. Closing the Stage and mutating navigation from `ON_PAUSE` caused the captured room disappearance and a `ConcurrentModificationException`, and it blocked focused Stage selection. |
 
 ## Open questions
 
@@ -364,6 +366,28 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 - Should the sample package/application ID and product branding remain until after the first prototype?
 
 ## Work-session log
+
+### 2026-08-18 — PM-1 Stage lifecycle and selection-access correction
+
+Outcome:
+
+- Inspected the complete timestamped manual-run log rather than relying on the earlier static room capture.
+- Identified a deterministic lifecycle defect in `MainNavHost`: the Decorate Space observer closed the Stage and popped the navigation back stack from `ON_PAUSE` while `NavController` was dispatching the same lifecycle transition.
+- Restricted automatic Stage teardown to `ON_DESTROY` and removed the lifecycle-callback navigation mutation. Explicit in-app back navigation still closes the Stage before returning home.
+- Updated the one-click launcher and the existing Project 01 runbook to distinguish the title-bar minimize (`-`) control from close (`X`), and to make minimize-panel-then-select the direct Stage interaction path.
+- Used the PICO Spatial SDK guidance and installed PICO OS 6 knowledge base. Official lifecycle guidance defines minimize as `ON_PAUSE -> ON_STOP`, close as `ON_PAUSE -> ON_STOP -> ON_DESTROY`, and demonstrates automatic Stage close on `ON_DESTROY` only.
+
+Validation:
+
+- `captures/pm1-stage-lifecycle-20260818-203613.log` contains exactly one `room` Stage open, three successful placements (`headphones`, `vase`, and `xr_headset`), zero `PM-1 tap [...]` callbacks, then `closeSpatialContainer room STAGE` from `MainNavHost.kt:74`.
+- The same transition terminates the app with `RuntimeException: Unable to pause activity` caused by `ConcurrentModificationException` in `androidx.navigation.NavController.lifecycleObserver`. This directly replaces the earlier provisional claim that the captured room disappearance was probably only a finite-scene/viewpoint effect.
+- Source inspection confirms the placed model entities already have the SDK-required `CollisionComponent` and `InteractableComponent`, and the gesture uses the documented `TargetEntity.hit(roomRoot)` descendant pattern. Direct selection remains unverified until the corrected runtime path produces a callback.
+- After applying the repository formatter, `spotlessApply spotlessCheck test :app:assembleDebug --no-daemon` passes in 1 minute 10 seconds (109 tasks). The corrected APK installed and launched as PID `6359` on `emulator-5554`, and its cleared crash buffer remained empty after launch.
+- Windows app control could identify and activate the `PICO Emulator - 6.0.0` window but could not capture it because the window crop was outside the captured monitor. No blind UI input was sent. Minimize survival and direct 3D selection remain manual runtime checkpoints rather than claimed validation.
+
+Next:
+
+- Place one object in the corrected build, minimize the panel, and confirm that the Stage remains open without a crash before attempting the three-object select/deselect pass.
 
 ### 2026-08-18 — One-click PM-1 emulator test launcher
 

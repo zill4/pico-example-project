@@ -437,10 +437,11 @@ The exact lifecycle lines may contain additional fields. A correct Full Stage sh
 2. Keep **Enable Controller Button Mode** on the left toolbar disabled. On the installed emulator, a purple/highlighted gamepad control means it is enabled; click it once so it is not highlighted.
 3. Move the mouse to aim the gaze cursor. Use one ordinary left mouse click to simulate the pinch/confirm action.
 4. Do not use `adb shell input tap` for this test. It injects 2D coordinates and is not accepted evidence for a volumetric or Stage hit.
+5. After placing an object, select the Decorate Space panel's **minimize (`-`)** title-bar control. Do not select its **close (`X`)** control. PICO documents minimize as `ON_PAUSE -> ON_STOP`; the Stage must remain open while the planar panel is in the background.
 
-Expected: moving over a placed 3D model produces the temporary PICO hover effect. That proves focus only; it does not prove selection.
+Expected: minimizing the panel leaves the app-authored room visible, gives the Stage focus, and lets the gaze cursor reach placed models. Moving over a placed 3D model produces the temporary PICO hover effect. That proves focus only; it does not prove selection.
 
-If a placed model is hidden by the planar panel, move the emulator viewpoint using the controls shown by the emulator, then return to **Eye Gesture Mode** before clicking. Testing one placed object at a time also reduces occlusion.
+If the close (`X`) control is selected, the WindowContainer reaches `ON_DESTROY` and the app intentionally closes the Stage. Reopen the app and repeat with minimize. If a placed model is still inaccessible, move the emulator viewpoint using the controls shown by the emulator, then return to **Eye Gesture Mode** before clicking. Testing one placed object at a time also reduces occlusion.
 
 #### 4. Prove select and deselect on three objects
 
@@ -451,18 +452,19 @@ For each object:
 1. On the Welcome Space home panel, select **Enter Room** before the first object. After resetting between objects, remain in the Stage and continue with the next object.
 2. Wait for the room to finish loading. Do not interact while cards are temporarily `Unavailable`; after `PM-1 scene ready`, all five normal targets should expose their add action.
 3. Select the object's `+` add action. The card must change to `In room`, the model must appear at its authored room position, and the log must contain `PM-1 place [<id>]: APPLIED`.
-4. Aim at the placed model itself—not its card preview—until the temporary hover effect appears.
-5. Left-click once, then move the pointer away from the model.
-6. Confirm all three selection signals:
+4. Minimize (`-`) the planar Decorate Space panel so the Stage has focus. Do not close (`X`) the panel.
+5. Aim at the placed model itself—not its card preview—until the temporary hover effect appears.
+6. Left-click once, then move the pointer away from the model.
+7. Confirm all three selection signals:
    - the card changes from `In room` to the text label `Selected`;
    - the model keeps the persistent Fresnel selection treatment after hover ends;
    - the log contains `PM-1 tap [<id>]: APPLIED`.
-7. Aim at the same model and left-click again.
-8. Confirm all three deselection signals:
+8. Aim at the same model and left-click again.
+9. Confirm all three deselection signals:
    - the card returns to `In room`;
    - the persistent selection treatment clears after hover ends;
    - the log contains `PM-1 tap [<id>]: DESELECTED`.
-9. Select **Reset room** before testing the next object, or keep several objects placed and verify that selecting a second object returns the first card to `In room`. Only one object may be selected at a time.
+10. Restore the minimized panel through the PICO app/window controls. Select **Reset room** before testing the next object, or keep several objects placed and verify that selecting a second object returns the first card to `In room`. Only one object may be selected at a time.
 
 Expected log sequence for each object:
 
@@ -507,6 +509,8 @@ Troubleshooting classification:
 | --- | --- |
 | No hover | The 3D target is not focused. Confirm the object is placed, aim at the model rather than its preview, and move the viewpoint if the panel occludes it. |
 | Hover works but no `Selected` label or tap log | First confirm Eye Gesture Mode and disable Controller Button Mode. If a direct manual click still fails, record it as a runtime interaction defect rather than a pass. |
+| The app room disappears when the panel is minimized | Stage lifecycle is defective. The panel's `ON_PAUSE`/`ON_STOP` must not close the Stage. |
+| The app room disappears after selecting the panel's close (`X`) control | Expected Stage teardown for the current flow. Reopen the app and use minimize (`-`) for direct room interaction. |
 | `Selected` appears but the highlight disappears with hover | Persistent selection feedback is defective; do not pass the visual checkpoint. |
 | A tap log reports an unknown or wrong ID | The entity-to-product mapping is defective; retain the exact line and the object clicked. |
 | `Unavailable` appears only while the room is loading | Wait for `PM-1 scene ready`; transient loading state is not the unavailable-path acceptance test. |
@@ -524,9 +528,18 @@ The explicit `Unavailable` state and invalid-object transitions are already cove
 - Runtime inspection: the current process is still running without a crash. Logs show exactly one app Stage named `room`, opened with `style:FULL`, `immersion=100`, and `useSystemEnvironment=false`; no second app Stage or second `WelcomeSpace_VR` load was found.
 - Scene inspection: `WelcomeSpace_VR` is loaded once as a finite model and positioned at `(0.15, 0, -3.6)` with a `-30` degree yaw. The app does not intentionally spawn the emulator environment.
 - Current evidence: `captures/pm1-double-room-report-2026-08-18.png` was retained locally for comparison. It shows the Decorate Space panel and app room while the Stage is active; it does not by itself capture the disappearance transition.
-- Working diagnosis: moving the simulated HMD likely crosses outside or behind the finite, interior-facing room shell, causing room surfaces to leave view or be back-face culled. The emulator then exposes its base-room backdrop. PICO's SDK contract says a `Full` Stage should block the underlying real/simulated environment, so backdrop visibility while this Stage remains active should be treated as an emulator compositor/scene-boundary issue rather than expected product behavior. This diagnosis remains provisional until the transition is recorded.
-- Next discriminator test: record the transition and note whether the Decorate Space panel remains visible. If the panel remains, the Stage is alive and the problem is room bounds/back-face/background composition. If the panel disappears or the home panel returns, investigate Stage lifecycle. Use the emulator's view reset/recenter control; if the app room returns immediately, that further supports a viewpoint-versus-finite-scene cause.
+- Corrected diagnosis from the timestamped lifecycle log: the captured disappearance included an unexpected Stage close followed by a main-thread `ConcurrentModificationException`. `MainNavHost` reacted to the planar panel's `ON_PAUSE` by closing the Stage and popping the navigation back stack while `NavController` was iterating lifecycle observers. The finite-room/background hypothesis may still explain any visual boundary seen while the Stage remains open, but it does not explain this captured disappearance and is no longer the primary cause.
+- Selection finding from the same log: `headphones`, `vase`, and `xr_headset` each produced an `APPLIED` placement, while no `PM-1 tap [...]` callback occurred. The Stage was unfocused while the planar panel was active, and the faulty `ON_PAUSE` handling prevented the intended minimize-panel-then-select flow.
+- Next discriminator test: run the lifecycle-corrected build, place one object, minimize (`-`) rather than close (`X`) the Decorate Space panel, and verify that the Stage remains open and a direct gaze/click produces `PM-1 tap [...]`. If the simulator base room becomes visible while the corrected Stage log remains open and focused, investigate finite-scene/background composition as a separate rendering issue.
 - Product consequence: do not block placement-state work on this symptom, but resolve or visibly contain it before the shareable simulator POC. Likely containment options are a distinct enclosing sky/background mesh and a validated starting viewpoint inside the authored room; neither is implemented or accepted yet.
+
+### 2026-08-18 — PM-1 Stage lifecycle correction
+
+- Status: `PM-1` remains in progress; build/install validation passes, while minimize survival and direct select/deselect still need simulator evidence.
+- Implementation: automatic Stage teardown now reacts only to the planar WindowContainer's `ON_DESTROY`; normal minimize/background `ON_PAUSE` and `ON_STOP` events leave the Stage active. The lifecycle callback no longer mutates the Navigation back stack. The explicit Decorate Space back action still closes the Stage and returns home.
+- Test guidance: the root one-click launcher now prints the required order: place an object, minimize (`-`) rather than close (`X`) the planar panel, use Eye Gesture Mode to aim at the placed room object, and click once while watching for `PM-1 tap [<id>]: APPLIED`.
+- Automated evidence: `spotlessApply spotlessCheck test :app:assembleDebug --no-daemon` passes in 1 minute 10 seconds (109 tasks). The exact debug APK installs and launches on `emulator-5554` as PID `6359`, with an empty cleared crash buffer after launch.
+- Remaining evidence: Windows app control could not capture the emulator window because it was outside the capturable monitor crop, so no blind clicks were sent. A manual minimize transition must show the Stage remains visible/focused, followed by select/deselect logs for three distinct stable IDs, before `PM-1` can pass.
 
 ## 2026-08-18 — MVP voice, brain, scene context, and simulator requirements
 

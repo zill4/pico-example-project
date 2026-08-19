@@ -130,7 +130,11 @@ $logcatArguments = @(
             Write-Host ''
             Write-Host '============================================================' -ForegroundColor Green
             Write-Host 'READY - CLICK ENTER ROOM NOW' -ForegroundColor Green
-            Write-Host 'Keep this window open while reproducing the room issue.' -ForegroundColor Green
+            Write-Host '1. Place an item and confirm its card says In room.' -ForegroundColor Green
+            Write-Host '2. MINIMIZE (-) the Decorate Space panel; do not CLOSE (X) it.' -ForegroundColor Green
+            Write-Host '3. In Eye Gesture Mode, aim at the placed object and left-click.' -ForegroundColor Green
+            Write-Host '4. Look here for PM-1 tap [object_id]: APPLIED.' -ForegroundColor Green
+            Write-Host 'Minimizing must leave the app room visible and interactive.' -ForegroundColor Green
             Write-Host 'When finished, return here and press Ctrl+C.' -ForegroundColor Green
             Write-Host '============================================================' -ForegroundColor Green
             Write-Host ''

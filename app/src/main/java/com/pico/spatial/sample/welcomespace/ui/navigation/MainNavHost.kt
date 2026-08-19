@@ -67,12 +67,9 @@ fun MainNavHost(modifier: Modifier = Modifier) {
                 val lifecycleOwner = LocalLifecycleOwner.current
                 DisposableEffect(lifecycleOwner) {
                     val observer = LifecycleEventObserver { _, event ->
-                        if (
-                            event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_DESTROY
-                        ) {
+                        if (event == Lifecycle.Event.ON_DESTROY) {
                             coroutine.launch(Dispatchers.Main.immediate) {
-                                closeStage()
-                                navController.popBackStack(NAV_ROUTE_HOME, false)
+                                spatialNavigator.closeStage()
                             }
                         }
                     }
