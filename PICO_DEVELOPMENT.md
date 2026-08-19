@@ -365,6 +365,24 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 
 ## Work-session log
 
+### 2026-08-18 — PM-1 manual emulator acceptance procedure
+
+Outcome:
+
+- Added a step-by-step `PM-1` PICO Emulator acceptance runbook to the existing `PROJECT_01_ROOM_QUEST.md`; no additional Project 01 Markdown file was created.
+- Defined the exact build/deploy preflight, Eye Gesture input configuration, three-object select/deselect proof, reset/exit sequence, filtered `RoomScene` logs, recording requirement, and pass/fail classifications.
+- Kept hover distinct from selection evidence and documented that 2D `adb shell input tap` is not a valid way to prove Stage interaction.
+- Kept transient loading state distinct from a real unavailable-object result; runtime missing-node acceptance remains a future debug-fixture case rather than an editor-asset mutation.
+
+Validation:
+
+- Cross-checked the procedure against the installed PICO emulator workflow guidance, the current `Pico_MVP`/`emulator-5554` baseline, the implemented PM-1 UI states, and the existing `RoomScene` diagnostic messages.
+- No Kotlin, Spatial Editor asset, build output, emulator state, or runtime behavior was changed or newly verified in this documentation step.
+
+Next:
+
+- Run the manual procedure, retain one continuous interaction recording plus filtered logs, and mark `PM-1` complete only if three stable object IDs pass select, deselect, reset, exit, and crash-free checks.
+
 ### 2026-08-18 — PM-1 spatial object foundation
 
 Outcome:

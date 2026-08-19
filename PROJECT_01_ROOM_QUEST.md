@@ -390,6 +390,142 @@ Add one entry when a marker starts, changes materially, or completes.
 - Local emulator note: `Pico_MVP.avd/controller_settings.ini` maps the left trigger to Qt key code `81` (`Q`). Controller-button mode and ordinary planar activation were exercised, but keyboard and automated pointer injection are not accepted as proof of a 3D tap callback.
 - Next: Manually click a hovered placed model in PICO Emulator (or use a physical device), capture `PM-1 tap [...]` select and deselect logs plus the non-color `Selected` label, then repeat for three models before completing `PM-1`.
 
+### 2026-08-18 — PM-1 manual PICO Emulator acceptance runbook
+
+Purpose: close the remaining `PM-1` interaction checkpoint with direct simulator evidence. Hover alone is not a pass. A passing selection must change product state, show persistent feedback after the pointer moves away, and log the stable product ID.
+
+#### 1. Build, start, install, and launch
+
+Run from the repository root in PowerShell:
+
+```powershell
+$env:JAVA_HOME = 'C:\Program Files\Android\Android Studio\jbr'
+$env:PATH = "$env:LOCALAPPDATA\PICO\sdk\6.0\editor\SpatialEditor;$env:PATH"
+.\gradlew.bat spotlessCheck test :app:assembleDebug --no-daemon
+
+pico-cli emulator start --avd Pico_MVP --wait-timeout 180 -y
+pico-cli device list --format json
+$env:PICO_CLI_DEVICE = 'emulator-5554'
+
+pico-cli app install .\app\build\outputs\apk\debug\app-debug.apk
+pico-cli app launch com.pico.spatial.sample.welcomespace --activity .platform.LaunchActivity
+```
+
+Expected:
+
+- Gradle ends with `BUILD SUCCESSFUL` and the debug APK exists.
+- The device list contains one online `emulator-5554` target.
+- Install and launch commands succeed, and the Welcome Space home panel appears.
+- The app remains running. A launch command alone is not proof that 3D interaction works.
+
+#### 2. Start a filtered log stream
+
+Open a second PowerShell terminal in the repository root:
+
+```powershell
+$env:PICO_CLI_DEVICE = 'emulator-5554'
+$platformAdb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
+$appProcessId = (& $platformAdb -s emulator-5554 shell pidof com.pico.spatial.sample.welcomespace).Trim()
+if (-not $appProcessId) { throw 'Welcome Space is not running on emulator-5554.' }
+
+pico-cli app logcat --pid $appProcessId --tag RoomScene --level I --follow
+```
+
+Leave this terminal open during the test and press `Ctrl+C` after evidence is captured. Expected startup evidence after entering the room is:
+
+```text
+PM-1 scene ready: 5 room objects available
+```
+
+#### 3. Configure simulator input
+
+1. In the emulator's lower-right **Change Mode** control, choose **Eye Gesture Mode**.
+2. Keep **Enable Controller Button Mode** on the left toolbar disabled. On the installed emulator, a purple/highlighted gamepad control means it is enabled; click it once so it is not highlighted.
+3. Move the mouse to aim the gaze cursor. Use one ordinary left mouse click to simulate the pinch/confirm action.
+4. Do not use `adb shell input tap` for this test. It injects 2D coordinates and is not accepted evidence for a volumetric or Stage hit.
+
+Expected: moving over a placed 3D model produces the temporary PICO hover effect. That proves focus only; it does not prove selection.
+
+If a placed model is hidden by the planar panel, move the emulator viewpoint using the controls shown by the emulator, then return to **Eye Gesture Mode** before clicking. Testing one placed object at a time also reduces occlusion.
+
+#### 4. Prove select and deselect on three objects
+
+Use `xr_headset`, `vase`, and `art_print` unless one is visually inaccessible; any three of the five stable objects are acceptable.
+
+For each object:
+
+1. On the Welcome Space home panel, select **Enter Room**.
+2. Wait for the room to finish loading. Do not interact while cards are temporarily `Unavailable`; after `PM-1 scene ready`, all five normal targets should expose their add action.
+3. Select the object's `+` add action. The card must change to `In room`, the model must appear at its authored room position, and the log must contain `PM-1 place [<id>]: APPLIED`.
+4. Aim at the placed model itself—not its card preview—until the temporary hover effect appears.
+5. Left-click once, then move the pointer away from the model.
+6. Confirm all three selection signals:
+   - the card changes from `In room` to the text label `Selected`;
+   - the model keeps the persistent Fresnel selection treatment after hover ends;
+   - the log contains `PM-1 tap [<id>]: APPLIED`.
+7. Aim at the same model and left-click again.
+8. Confirm all three deselection signals:
+   - the card returns to `In room`;
+   - the persistent selection treatment clears after hover ends;
+   - the log contains `PM-1 tap [<id>]: DESELECTED`.
+9. Select **Reset room** before testing the next object, or keep several objects placed and verify that selecting a second object returns the first card to `In room`. Only one object may be selected at a time.
+
+Expected log sequence for each object:
+
+```text
+PM-1 place [xr_headset]: APPLIED
+PM-1 tap [xr_headset]: APPLIED
+PM-1 tap [xr_headset]: DESELECTED
+```
+
+The bracketed ID changes for each model. Editor names such as `PicoEquipment` are not acceptable product-level evidence.
+
+#### 5. Prove reset and Stage exit
+
+1. Place and select at least one object.
+2. Select **Reset room**.
+3. Confirm that all five cards return to their add action, all placed product models are hidden, no card says `Selected`, and no persistent selection treatment remains.
+4. Confirm the log contains `PM-1 room reset`.
+5. Use the top-left back control to exit the Stage.
+6. Confirm the Welcome Space home panel returns, the app does not close, and re-entering the room starts with a fresh room state.
+
+#### 6. Record evidence and check crashes
+
+Use the PICO Emulator's built-in screen-recording control for the spatial proof. Record one continuous clip containing three object select/deselect cycles, reset, and Stage exit. Save it locally under `captures/`, which is intentionally ignored by Git.
+
+After stopping the live log, collect the recent interaction and crash evidence:
+
+```powershell
+pico-cli app logcat --pid $appProcessId --lines 300 --tag RoomScene --level I
+pico-cli app logcat --pid $appProcessId --buffer crash --lines 200 --level E
+```
+
+Expected: the interaction log contains the scene-ready, placement, select, deselect, and reset lines; the crash-buffer command returns no app crash entry. If a CLI screenshot of the spatial compositor is black, use the emulator's built-in screenshot or recording control instead.
+
+#### 7. PM-1 pass/fail rule
+
+`PM-1` passes only when:
+
+- three distinct stable IDs each produce a visible hover, `Selected` label, persistent selection feedback, `APPLIED` tap log, visible deselection, and `DESELECTED` tap log;
+- only one object is selected at a time;
+- reset restores the original room state;
+- Stage exit returns to Welcome Space without an app crash; and
+- the recording and filtered logs are retained as local evidence.
+
+Troubleshooting classification:
+
+| Observation | Interpretation and next check |
+| --- | --- |
+| No hover | The 3D target is not focused. Confirm the object is placed, aim at the model rather than its preview, and move the viewpoint if the panel occludes it. |
+| Hover works but no `Selected` label or tap log | First confirm Eye Gesture Mode and disable Controller Button Mode. If a direct manual click still fails, record it as a runtime interaction defect rather than a pass. |
+| `Selected` appears but the highlight disappears with hover | Persistent selection feedback is defective; do not pass the visual checkpoint. |
+| A tap log reports an unknown or wrong ID | The entity-to-product mapping is defective; retain the exact line and the object clicked. |
+| `Unavailable` appears only while the room is loading | Wait for `PM-1 scene ready`; transient loading state is not the unavailable-path acceptance test. |
+| `Unavailable` remains after scene-ready | Treat it as a missing target/scene defect. Do not modify editor assets merely to finish this acceptance run. |
+| App closes or returns to the launcher | Collect the crash buffer and retain the recording; lifecycle acceptance failed. |
+
+The explicit `Unavailable` state and invalid-object transitions are already covered by pure tests. A true runtime missing-node proof should use a dedicated future debug fixture; transient loading or destructive asset edits are not accepted substitutes.
+
 ## 2026-08-18 — MVP voice, brain, scene context, and simulator requirements
 
 - Status: Accepted requirements baseline; implementation not started
