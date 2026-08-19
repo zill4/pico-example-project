@@ -365,6 +365,25 @@ The launcher intentionally points `ANDROID_SDK_ROOT` at PICO's emulator system i
 
 ## Work-session log
 
+### 2026-08-18 — Corrected pre-entry Stage logging
+
+Outcome:
+
+- Clarified that a `RoomScene`-only stream can already be attached before room entry but remain silent until the first matching room-load event, making it appear to start late.
+- Replaced that instruction with a broader lifecycle stream that prints an explicit attached marker, writes to a timestamped file under ignored `captures/`, and includes `SpatialPack_SpatialContainer`, `LifeCycle`, and `RoomScene` events.
+- Added an explicit stop point on the Welcome Space home panel so **Enter Room** is not selected until the logging terminal visibly confirms attachment.
+- Recorded that the user reproduced the same overlapping-room behavior; the finite-scene versus Stage-lifecycle diagnosis still needs a transition recording and panel-visibility observation.
+
+Validation:
+
+- The revised filter covers the previously observed `opening stage room`, `Stage-room onContainerCreate`, Full/immersion/system-environment state, PM-1 room events, and Stage close/destroy diagnostics in one stream.
+- At the time of this documentation update, `pico-cli emulator status` reported no running emulator process or online ADB device. The emulator was not restarted, so the corrected live command has not yet been exercised in a fresh run.
+- No application code, Spatial Editor asset, build output, emulator data, or installed tool was changed.
+
+Next:
+
+- Start the emulator/app, remain on the home panel until the lifecycle logger prints its attached marker, then record the room transition and note whether the Decorate Space panel survives when the app room disappears.
+
 ### 2026-08-18 — PM-1 placement evidence and overlapping-room diagnosis
 
 Outcome:

@@ -416,9 +416,10 @@ Expected:
 - Gradle ends with `BUILD SUCCESSFUL` and the debug APK exists.
 - The device list contains one online `emulator-5554` target.
 - Install and launch commands succeed, and the Welcome Space home panel appears.
+- Stop at the home panel. Do not select **Enter Room** until the logger in the next step prints its explicit attached message.
 - The app remains running. A launch command alone is not proof that 3D interaction works.
 
-#### 2. Start a filtered log stream
+#### 2. Attach the lifecycle log before entering the room
 
 Open a second PowerShell terminal in the repository root:
 
@@ -428,14 +429,29 @@ $platformAdb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 $appProcessId = (& $platformAdb -s emulator-5554 shell pidof com.pico.spatial.sample.welcomespace).Trim()
 if (-not $appProcessId) { throw 'Welcome Space is not running on emulator-5554.' }
 
-pico-cli app logcat --pid $appProcessId --tag RoomScene --level I --follow
+New-Item -ItemType Directory -Force .\captures | Out-Null
+$stageLogPath = Join-Path (Resolve-Path .\captures).Path "pm1-stage-lifecycle-$((Get-Date).ToString('yyyyMMdd-HHmmss')).log"
+"Logger attached before Enter Room; writing $stageLogPath" |
+    Tee-Object -FilePath $stageLogPath
+
+pico-cli app logcat --pid $appProcessId --lines 50 --level I --follow |
+    Select-String -Pattern 'SpatialPack_SpatialContainer|LifeCycle|RoomScene' |
+    Tee-Object -FilePath $stageLogPath -Append
 ```
 
-Leave this terminal open during the test and press `Ctrl+C` after evidence is captured. Expected startup evidence after entering the room is:
+Wait until `Logger attached before Enter Room` is visible, then select **Enter Room** in the emulator. Leave this terminal open during the test and press `Ctrl+C` after evidence is captured.
+
+The older `--tag RoomScene` command could appear to start late because the app emits no `RoomScene` messages on the home screen. Its first matching event occurs only after the Stage opens and the room finishes loading. The broader stream above is already attached before entry and also captures Stage open, focus, and close/destroy events.
+
+Expected entry evidence includes:
 
 ```text
+opening stage room with [style:FULL,...]
+Stage-room onContainerCreate
 PM-1 scene ready: 5 room objects available
 ```
+
+The exact lifecycle lines may contain additional fields. A correct Full Stage should report immersion `100` and `useSystemEnvironment=false`.
 
 #### 3. Configure simulator input
 
@@ -531,6 +547,7 @@ The explicit `Unavailable` state and invalid-object transitions are already cove
 - Status: `PM-1` remains in progress.
 - User-reported evidence: each tested add action made its model appear in the room and changed the product card to `In room`. This is accepted as manual placement feedback, but it does not prove the direct 3D select/deselect callback because no `Selected` label or `PM-1 tap [...]` log was reported.
 - Reported defect: the app-authored room appeared to overlap the emulator's starting simulation room. After moving the simulated viewpoint, the app room disappeared and the starting simulation room became visible.
+- Repeat result: the user reproduced the same visual behavior. The original `RoomScene`-only logging command appeared to begin after room entry because that tag has no pre-entry event; this is a logging-instruction ambiguity, not evidence that the Stage was created before logging attached.
 - Runtime inspection: the current process is still running without a crash. Logs show exactly one app Stage named `room`, opened with `style:FULL`, `immersion=100`, and `useSystemEnvironment=false`; no second app Stage or second `WelcomeSpace_VR` load was found.
 - Scene inspection: `WelcomeSpace_VR` is loaded once as a finite model and positioned at `(0.15, 0, -3.6)` with a `-30` degree yaw. The app does not intentionally spawn the emulator environment.
 - Current evidence: `captures/pm1-double-room-report-2026-08-18.png` was retained locally for comparison. It shows the Decorate Space panel and app room while the Stage is active; it does not by itself capture the disappearance transition.
